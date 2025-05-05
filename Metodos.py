@@ -127,11 +127,15 @@ class Metodos_Estudiantes:
         with open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="") as Est_Ing_CSV:
             Est_Ing_CSV.seek(0)
             lector_ing = csv.reader(Est_Ing_CSV)
-            print(lector_ing)
+            for registro in lector_ing:
+                cedula, nombre, apellido, telefono, semestre, promedio, serial = registro
+                print(cedula, nombre, apellido, telefono, semestre, promedio, serial)
         with open("PracticaFinal/Estudiantes_Diseno.csv", "a+", newline="") as Est_Dis_CSV:
             Est_Dis_CSV.seek(0)
             lector_dis = csv.reader(Est_Dis_CSV)
-            print(lector_dis)
+            for registro in lector_dis:
+                cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial = registro
+                print(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial)
 
 class Metodos_Equipos:
     def registrar_equipo(self):
