@@ -65,7 +65,7 @@ class Metodos_Estudiantes:
             var_semestre = int(input("Ingresa el/la semestre: ")) 
             var_promedio = float(input("Ingresa el/la promedio: "))
                         
-            with open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="") as Est_Ing_CSV:
+            with open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="", encoding='utf-8') as Est_Ing_CSV:
                 Est_Ing_CSV.seek(0)
                 Lector_Ing = csv.reader(Est_Ing_CSV)
                 Escritor_Ing = csv.writer(Est_Ing_CSV)
@@ -96,7 +96,7 @@ class Metodos_Estudiantes:
             var_modalidad = input("Ingresa el/la modalidad: ") 
             var_cantidad_asignaturas = int(input("Ingresa el/la cantidad de asignaturas: "))
                         
-            with open("PracticaFinal/Estudiantes_Diseno.csv", "a+", newline="") as Est_Dis_CSV:
+            with open("PracticaFinal/Estudiantes_Diseno.csv", "a+", newline="", encoding='utf-8') as Est_Dis_CSV:
                 Est_Dis_CSV.seek(0)
                 Lector_Dis = csv.reader(Est_Dis_CSV)
                 Escritor_Dis = csv.writer(Est_Dis_CSV)
@@ -120,22 +120,43 @@ class Metodos_Estudiantes:
             Est_Dis_CSV.close()
         
     def modificar_estudiantes(self):
-        pass
+        with open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="", encoding='utf-8') as Est_Ing_CSV:
+            Est_Ing_CSV.seek(0)
+            lector_ing = csv.reader(Est_Ing_CSV)
+            lista_estudiates_ingenieria = []
+            for estudiante in lector_ing:
+                cedula, nombre, apellido, telefono, semestre, promedio, serial = estudiante
+                lista_estudiates_ingenieria.append(ESTUDIANTE_INGENIERIA(cedula, nombre, apellido, telefono, semestre, promedio, serial))
+        with open("PracticaFinal/Estudiantes_Diseno.csv", "a+", newline="", encoding='utf-8') as Est_Dis_CSV:
+            Est_Dis_CSV.seek(0)
+            lector_dis = csv.reader(Est_Dis_CSV)
+            lista_estudiates_ingenieria = []
+            for registro in lector_dis:
+                cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial = registro
+                lista_estudiates_ingenieria.append(ESTUDIANTE_DISENO(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial))
+
+        Est_Ing_CSV.close()
+        Est_Dis_CSV.close()        
+
     def inactivar_estudiantes(self):
         pass
     def mostrar_estudiantes(self):
-        with open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="") as Est_Ing_CSV:
+        with open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="", encoding='utf-8') as Est_Ing_CSV:
             Est_Ing_CSV.seek(0)
             lector_ing = csv.reader(Est_Ing_CSV)
             for registro in lector_ing:
                 cedula, nombre, apellido, telefono, semestre, promedio, serial = registro
                 print(cedula, nombre, apellido, telefono, semestre, promedio, serial)
-        with open("PracticaFinal/Estudiantes_Diseno.csv", "a+", newline="") as Est_Dis_CSV:
+
+        with open("PracticaFinal/Estudiantes_Diseno.csv", "a+", newline="", encoding='utf-8') as Est_Dis_CSV:
             Est_Dis_CSV.seek(0)
             lector_dis = csv.reader(Est_Dis_CSV)
             for registro in lector_dis:
                 cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial = registro
                 print(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial)
+
+        Est_Ing_CSV.close()
+        Est_Dis_CSV.close()
 
 class Metodos_Equipos:
     def registrar_equipo(self):
