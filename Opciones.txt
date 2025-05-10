@@ -1,0 +1,24 @@
+Pantalla inicial solicitando el número de cédula o la opción de registro.
+Validar cédula ingresada en el .csv (validación de carrera en curso)
+Se muestra menú según carrera.
+
+- Roles
+    - Estudiantes (Puede hacer modificaciones solo en su usuario)
+        - Ingeniería
+            - Registrar préstamo de equipo.
+            - Modificar préstamo de equipo. (Por serial o cedula).
+            - Devolución de equipo (se elimina el registro). (Por serial o cedula).
+            - Buscar equipo (Por serial o cedula).
+            - Volver al menú principal.
+        - Diseño
+            - Registrar préstamo de equipo.
+            - Modificar préstamo de equipo. (Por serial o cedula).
+            - Devolución de equipo (se elimina el registro). (Por serial o cedula).
+            - Buscar equipo (Por serial o cedula)
+            - Volver al menú principal.
+    - Administrador (Puede hacer modificaciones en en cualquier cédula registrada)
+        - Registrar préstamo de equipo.
+        - Modificar préstamo de equipo. (Por serial o cedula).
+        - Devolución de equipo (se elimina el registro). (Por serial o cedula).
+        - Buscar equipo (Por serial o cedula).
+        - Volver al menú principal.

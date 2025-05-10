@@ -1,8 +1,6 @@
-import Metodos as Mt
 
-obj = Mt.Metodos_Estudiantes()
-obj.registrar_estudiantes()
-obj.mostrar_estudiantes()
+
+
 
 #while True:
 #    try:

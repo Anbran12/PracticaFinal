@@ -1,4 +1,5 @@
 import csv
+import customtkinter as CTK
 
 class ESTUDIANTES:
     def __init__(self, cedula, nombre, apellido, telefono):
@@ -51,13 +52,73 @@ class COMPUTADOR_PORTATIL(DISPOSITIVOS):
 
     def convertir_lista(self):
         return [self.serial,self.marca,self.tamano,self.precio,self.sistema_operativo,self.procesador]
-        
-class Metodos_Estudiantes:
-    def registrar_estudiantes(self):
-        
-        carrera = int(input("¿Qué carrera esta estudiando? 1. Ingenieria / 2. Diseño"))
 
-        if carrera == 1:    
+class PANTALLA_PRINCIPAL:
+    def __init__(self):
+        self.pagina_inicial = CTK.CTk()
+        self.pagina_inicial.geometry("+300+100")
+        self.pantalla_login()
+    
+    def pantalla_login(self):
+        def login_validacion():
+            cedula_busqueda = self.entrada_busqueda.get()
+            try:
+                cedula_busqueda = int(cedula_busqueda)
+            except ValueError:
+                self.etiqueta_busqueda_error.configure(text="Valor ingresado no valido")
+                self.etiqueta_busqueda_error.pack()
+                return
+            if cedula_busqueda == 1234:
+                self.pagina_inicial.title("EQUIPOS ELECTRÓNICOS SAN JUAN DE DIOS")
+                self.frame_pantalla_busqueda.destroy()
+                self.menu_administrador()
+            else:
+                self.etiqueta_busqueda_error.configure(text="Usuario no existe")
+                self.etiqueta_busqueda_error.pack()
+
+        self.frame_pantalla_busqueda = CTK.CTkFrame(self.pagina_inicial)
+        self.frame_pantalla_busqueda.pack()
+        
+        self.pagina_inicial.title("Login")
+        self.etiqueta_busqueda = CTK.CTkLabel(self.frame_pantalla_busqueda, text="Ingresa tu documento de identidad")
+        self.etiqueta_busqueda.pack(pady=10, padx=10)
+
+        self.entrada_busqueda = CTK.CTkEntry(self.frame_pantalla_busqueda)
+        self.entrada_busqueda.pack()
+
+        self.etiqueta_busqueda_error = CTK.CTkLabel(self.frame_pantalla_busqueda, text="")
+
+        self.boton_busqueda = CTK.CTkButton(self.frame_pantalla_busqueda, text="Buscar", command=login_validacion)
+        self.boton_busqueda.pack(pady=10, padx=10)
+        
+    def menu_estudiantes(self):
+        objeto_prestamo_equipos = Metodos_Prestamos()
+        
+    def menu_administrador(self):
+        objeto_registro_estudiantes = Metodos_Estudiantes()
+        objeto_registro_estudiantes.registrar_estudiantes_validacion_carrera()
+        objeto_registro_equipos = Metodos_Equipos()
+        objeto_prestamo_equipos = Metodos_Prestamos()
+   
+class Metodos_Estudiantes:
+    def registrar_estudiantes_validacion_carrera(self):
+        self.ventana_registro_estudiantes = CTK.CTkToplevel()
+        self.ventana_registro_estudiantes.geometry("+300+100")
+        self.ventana_registro_estudiantes.focus()
+        self.ventana_registro_estudiantes.grab_set()
+        self.frame_validacion_carrera = CTK.CTkFrame(self.ventana_registro_estudiantes)
+        self.frame_validacion_carrera.pack()
+        self.etiqueta_carrera = CTK.CTkLabel(self.frame_validacion_carrera, text="¿Qué carrera esta estudiando?")
+        self.etiqueta_carrera.grid()
+        self.desplegable_carrera = CTK.CTkComboBox(self.frame_validacion_carrera, values=["Ingeniería","Diseño"], state="readonly")
+        self.desplegable_carrera.set("Ingeniería")
+        self.desplegable_carrera.grid()
+        self.boton_carrera = CTK.CTkButton(self.frame_validacion_carrera, text="Continuar", command=self.registro_segun_eleccion_carrera)
+        self.boton_carrera.grid()
+
+    def registro_segun_eleccion_carrera(self):
+        eleccion_carrera = self.desplegable_carrera.get()
+        if eleccion_carrera == "Ingeniería":  
             var_cedula = input("Ingresa el/la cedula: ") 
             var_nombre = input("Ingresa el/la nombre: ") 
             var_apellido = input("Ingresa el/la apellido: ") 
@@ -87,8 +148,8 @@ class Metodos_Estudiantes:
                     print("Registro exitoso.")
             
             Est_Ing_CSV.close()
-                        
-        elif carrera == 2:    
+                    
+        elif eleccion_carrera == "Diseño":
             var_cedula = input("Ingresa el/la cedula: ") 
             var_nombre = input("Ingresa el/la nombre: ") 
             var_apellido = input("Ingresa el/la apellido: ") 
