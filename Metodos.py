@@ -60,6 +60,8 @@ class PANTALLA_PRINCIPAL:
         self.pantalla_login()
     
     def pantalla_login(self):
+        objeto_lector_estudiantes = Metodos_Estudiantes()
+        objeto_lector_estudiantes.lector_csv_estudiantes() # Ejecución de método lector para usar las listas
         def login_validacion():
             cedula_busqueda = self.entrada_busqueda.get()
             try:
@@ -91,6 +93,9 @@ class PANTALLA_PRINCIPAL:
         self.boton_busqueda = CTK.CTkButton(self.frame_pantalla_busqueda, text="Buscar", command=login_validacion)
         self.boton_busqueda.pack(pady=10, padx=10)
         
+        objeto_lector_estudiantes.Estudiantes_ingenieria_csv.close()
+        objeto_lector_estudiantes.Estudiantes_diseno_csv.close()
+        
     def menu_estudiantes(self):
         objeto_prestamo_equipos = Metodos_Prestamos()
         
@@ -101,7 +106,39 @@ class PANTALLA_PRINCIPAL:
         objeto_prestamo_equipos = Metodos_Prestamos()
    
 class Metodos_Estudiantes:
+    def lector_csv_estudiantes(self):
+        self.Estudiantes_ingenieria_csv = open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="", encoding='utf-8')
+        self.Estudiantes_ingenieria_csv.seek(0)
+        self.Lector_Ingenieria = csv.reader(self.Estudiantes_ingenieria_csv)
+        self.Escritor_Ingenieria = csv.writer(self.Estudiantes_ingenieria_csv)
+        self.cedulas_estudiantes_ingenieria_lista = []
+        self.estudiantes_ingenieria_lista = []
+
+        for estudiante in self.Lector_Ingenieria:
+            cedula = estudiante[0]
+            self.cedulas_estudiantes_ingenieria_lista.append(cedula)
+
+        for estudiante in self.Lector_Ingenieria:
+            cedula, nombre, apellido, telefono, semestre, promedio, serial = estudiante
+            self.estudiantes_ingenieria_lista.append(ESTUDIANTE_INGENIERIA(cedula, nombre, apellido, telefono, semestre, promedio, serial))
+                
+        self.Estudiantes_diseno_csv = open("PracticaFinal/Estudiantes_Diseno.csv", "a+", newline="", encoding='utf-8')
+        self.Estudiantes_diseno_csv.seek(0)
+        self.Lector_Diseno = csv.reader(self.Estudiantes_diseno_csv)
+        self.Escritor_Diseno = csv.writer(self.Estudiantes_diseno_csv)
+        self.cedulas_estudiantes_diseno_lista = []
+        self.estudiantes_diseno_lista = []
+
+        for estudiante in self.Lector_Diseno:
+            cedula = estudiante[0]
+            self.cedulas_estudiantes_diseno_lista.append(cedula)
+
+        for registro in self.Lector_Diseno:
+            cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial = registro
+            self.estudiantes_diseno_lista.append(ESTUDIANTE_DISENO(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial))            
+
     def registrar_estudiantes_validacion_carrera(self):
+        self.lector_csv_estudiantes()
         self.ventana_registro_estudiantes = CTK.CTkToplevel()
         self.ventana_registro_estudiantes.geometry("+300+100")
         self.ventana_registro_estudiantes.focus()
@@ -117,107 +154,176 @@ class Metodos_Estudiantes:
         self.boton_carrera.grid()
 
     def registro_segun_eleccion_carrera(self):
-        eleccion_carrera = self.desplegable_carrera.get()
-        if eleccion_carrera == "Ingeniería":  
-            var_cedula = input("Ingresa el/la cedula: ") 
-            var_nombre = input("Ingresa el/la nombre: ") 
-            var_apellido = input("Ingresa el/la apellido: ") 
-            var_telefono = input("Ingresa el/la telefono: ") 
-            var_semestre = int(input("Ingresa el/la semestre: ")) 
-            var_promedio = float(input("Ingresa el/la promedio: "))
-                        
-            with open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="", encoding='utf-8') as Est_Ing_CSV:
-                Est_Ing_CSV.seek(0)
-                Lector_Ing = csv.reader(Est_Ing_CSV)
-                Escritor_Ing = csv.writer(Est_Ing_CSV)
-                
-                for c in Lector_Ing:
-                    registro_actual = c[0]
+        self.frame_eleccion_carrera = CTK.CTkFrame(self.ventana_registro_estudiantes)
+        self.frame_eleccion_carrera.pack()
+        self.eleccion_carrera = self.desplegable_carrera.get()
+        self.frame_validacion_carrera.destroy()
+        
+        self.etiqueta_cedula = CTK.CTkLabel(self.frame_eleccion_carrera, text="Cédula")
+        self.etiqueta_cedula.grid(row=1,column=0,pady=5,padx=10)
+        self.entrada_cedula = CTK.CTkEntry(self.frame_eleccion_carrera)
+        self.entrada_cedula.grid(row=1,column=1,pady=5,padx=10)
+        self.etiqueta_nombre = CTK.CTkLabel(self.frame_eleccion_carrera, text="Nombre")
+        self.etiqueta_nombre.grid(row=2,column=0,pady=5,padx=10)
+        self.entrada_nombre = CTK.CTkEntry(self.frame_eleccion_carrera)
+        self.entrada_nombre.grid(row=2,column=1,pady=5,padx=10)
+        self.etiqueta_apellido = CTK.CTkLabel(self.frame_eleccion_carrera, text="Apellido")
+        self.etiqueta_apellido.grid(row=3,column=0,pady=5,padx=10)
+        self.entrada_apellido = CTK.CTkEntry(self.frame_eleccion_carrera)
+        self.entrada_apellido.grid(row=3,column=1,pady=5,padx=10)
+        self.etiqueta_telefono = CTK.CTkLabel(self.frame_eleccion_carrera, text="Teléfono")
+        self.etiqueta_telefono.grid(row=4,column=0,pady=5,padx=10)
+        self.entrada_telefono = CTK.CTkEntry(self.frame_eleccion_carrera)
+        self.entrada_telefono.grid(row=4,column=1,pady=5,padx=10)
+
+        if self.eleccion_carrera == "Ingeniería":
+            
+            self.etiqueta_carrera = CTK.CTkLabel(self.frame_eleccion_carrera, text=self.eleccion_carrera)
+            self.etiqueta_carrera.grid(row=0, column=0,pady=5,padx=10, columnspan=2)
+            
+            self.etiqueta_semestre = CTK.CTkLabel(self.frame_eleccion_carrera, text="Semestre")
+            self.etiqueta_semestre.grid(row=5,column=0,pady=5,padx=10)
+            self.desplegable_semestre = CTK.CTkComboBox(self.frame_eleccion_carrera, values=[str(i+1) for i in range(12)], state="readonly")
+            self.desplegable_semestre.set("1")
+            self.desplegable_semestre.grid(row=5,column=1,pady=5,padx=10)
+            self.etiqueta_promedio = CTK.CTkLabel(self.frame_eleccion_carrera, text="Promedio")
+            self.etiqueta_promedio.grid(row=6,column=0,pady=5,padx=10)
+            self.entrada_promedio = CTK.CTkEntry(self.frame_eleccion_carrera)
+            self.entrada_promedio.grid(row=6,column=1,pady=5,padx=10)
+
+        elif self.eleccion_carrera == "Diseño":
+
+            self.etiqueta_carrera = CTK.CTkLabel(self.frame_eleccion_carrera, text=self.eleccion_carrera)
+            self.etiqueta_carrera.grid(row=0, column=0,pady=5,padx=10, columnspan=2)
+            
+            self.etiqueta_modalidad = CTK.CTkLabel(self.frame_eleccion_carrera, text="Modalidad")
+            self.etiqueta_modalidad.grid(row=5,column=0,pady=5,padx=10)
+            self.desplegable_modalidad = CTK.CTkComboBox(self.frame_eleccion_carrera, values=["Virtual","Presencial","Mixto"], state="readonly")
+            self.desplegable_modalidad.set("Seleccione")
+            self.desplegable_modalidad.grid(row=5,column=1,pady=5,padx=10)
+            self.etiqueta_cantidad_materias = CTK.CTkLabel(self.frame_eleccion_carrera, text="Cantidad de materias")
+            self.etiqueta_cantidad_materias.grid(row=6,column=0,pady=5,padx=10)
+            self.desplegable_cantidad_materias = CTK.CTkComboBox(self.frame_eleccion_carrera, values=[str(i+1) for i in range(20)], state="readonly")
+            self.desplegable_cantidad_materias.set(0)
+            self.desplegable_cantidad_materias.grid(row=6,column=1,pady=5,padx=10)
+        
+        self.boton_validacion = CTK.CTkButton(self.frame_eleccion_carrera, text="Registrar", command=self.validacion_errores_registro)
+        self.boton_validacion.grid(row=7,column=0, columnspan=2,pady=5,padx=10)
+
+            
+    def validacion_errores_registro(self):
+        self.ventana_errores_registro = CTK.CTkToplevel()
+        self.ventana_errores_registro.focus()
+        self.ventana_errores_registro.grab_set()
+        self.ventana_errores_registro.geometry("+300+100")
+        self.frame_errores_registro = CTK.CTkScrollableFrame(self.ventana_errores_registro)
+        self.lista_errores_registro = []
+        
+        if not self.entrada_cedula.get():
+            self.lista_errores_registro.append("Ingresar cédula.")
+        if not self.entrada_nombre.get():
+            self.lista_errores_registro.append("Ingresar nombre.")
+        if not self.entrada_apellido.get():
+            self.lista_errores_registro.append("Ingresar apellido.")
+        if not self.entrada_telefono.get():
+            self.lista_errores_registro.append("Ingresar teléfono.")
+        
+        if self.eleccion_carrera == "Ingeniería":
+            
+            if not self.entrada_promedio.get():
+                self.lista_errores_registro.append("Ingresar promedio.")
+            elif self.entrada_promedio.get():
+                try:
+                    float(self.entrada_promedio.get())
+                except ValueError:
+                    self.lista_errores_registro.append("Promedio: Valor ingresado no válido.")
+
+        elif self.eleccion_carrera == "Diseño":
+            
+            if self.desplegable_modalidad.get() == "Seleccione":
+                self.lista_errores_registro.append("Seleccione una modalidad de estudio.")
+            if self.desplegable_cantidad_materias.get() == 0:
+                self.lista_errores_registro.append("Seleccione la cantidad de materias.")
+
+        if len(self.lista_errores_registro) > 0:
+
+            self.ventana_errores_registro.title("Error de registro")
+            self.mensaje_error = CTK.CTkLabel(self.ventana_errores_registro, text="Se presentan las siguientes inconsistencias en el registro: ")
+            self.mensaje_error.pack(pady=5,padx=10)
+            self.frame_errores_registro.pack(pady=5,padx=10)
+            for numero, elemento in enumerate(self.lista_errores_registro):
+                CTK.CTkLabel(self.frame_errores_registro, text=f"{numero+1}. {elemento}", justify="left", anchor="w").pack(padx=5,anchor="w")
+            return
+
+        else:
+            if self.eleccion_carrera == "Ingeniería":
+                self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas
+                            
+                for registro_actual in self.cedulas_estudiantes_ingenieria_lista:
                     if registro_actual == var_cedula:
                         print("La persona ingresada ya se encuentra registrada.")
                         break
                     else:
                         registro = ESTUDIANTE_INGENIERIA(var_cedula,var_nombre,var_apellido,var_telefono,var_semestre,var_promedio)
-                        Escritor_Ing.writerow(registro.convertir_lista())
+                        self.Escritor_Ingenieria.writerow(registro.convertir_lista())
                         print("Registro exitoso.")
                         break
                 
-                if next(Lector_Ing, None) is None:
+                if len(self.cedulas_estudiantes_ingenieria_lista) == 0:
                     registro = ESTUDIANTE_INGENIERIA(var_cedula,var_nombre,var_apellido,var_telefono,var_semestre,var_promedio)
-                    Escritor_Ing.writerow(registro.convertir_lista())
+                    self.Escritor_Ingenieria.writerow(registro.convertir_lista())
                     print("Registro exitoso.")
-            
-            Est_Ing_CSV.close()
-                    
-        elif eleccion_carrera == "Diseño":
-            var_cedula = input("Ingresa el/la cedula: ") 
-            var_nombre = input("Ingresa el/la nombre: ") 
-            var_apellido = input("Ingresa el/la apellido: ") 
-            var_telefono = input("Ingresa el/la telefono: ") 
-            var_modalidad = input("Ingresa el/la modalidad: ") 
-            var_cantidad_asignaturas = int(input("Ingresa el/la cantidad de asignaturas: "))
-                        
-            with open("PracticaFinal/Estudiantes_Diseno.csv", "a+", newline="", encoding='utf-8') as Est_Dis_CSV:
-                Est_Dis_CSV.seek(0)
-                Lector_Dis = csv.reader(Est_Dis_CSV)
-                Escritor_Dis = csv.writer(Est_Dis_CSV)
                 
-                for c in Lector_Dis:
-                    registro_actual = c[0]
+                self.Estudiantes_ingenieria_csv.close()
+                        
+            elif self.eleccion_carrera == "Diseño":
+                self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas
+                var_cedula = input("Ingresa el/la cedula: ") 
+                var_nombre = input("Ingresa el/la nombre: ") 
+                var_apellido = input("Ingresa el/la apellido: ") 
+                var_telefono = input("Ingresa el/la telefono: ") 
+                var_modalidad = input("Ingresa el/la modalidad: ") 
+                var_cantidad_asignaturas = int(input("Ingresa el/la cantidad de asignaturas: "))
+
+                for registro_actual in self.cedulas_estudiantes_diseno_lista:
                     if registro_actual == var_cedula:
                         print("La persona ingresada ya se encuentra registrada.")
                         break
                     else:
                         registro = ESTUDIANTE_DISENO(var_cedula,var_nombre,var_apellido,var_telefono,var_modalidad,var_cantidad_asignaturas)
-                        Escritor_Dis.writerow(registro.convertir_lista())
+                        self.Escritor_Diseno.writerow(registro.convertir_lista())
                         print("Registro exitoso.")
                         break
                     
-                if next(Lector_Dis, None) is None:
+                if len(self.cedulas_estudiantes_diseno_lista) == 0:
                     registro = ESTUDIANTE_DISENO(var_cedula,var_nombre,var_apellido,var_telefono,var_modalidad,var_cantidad_asignaturas)
-                    Escritor_Dis.writerow(registro.convertir_lista())
+                    self.Escritor_Diseno.writerow(registro.convertir_lista())
                     print("Registro exitoso.")
 
-            Est_Dis_CSV.close()
+                self.Estudiantes_diseno_csv.close()
         
     def modificar_estudiantes(self):
-        with open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="", encoding='utf-8') as Est_Ing_CSV:
-            Est_Ing_CSV.seek(0)
-            lector_ing = csv.reader(Est_Ing_CSV)
-            lista_estudiates_ingenieria = []
-            for estudiante in lector_ing:
-                cedula, nombre, apellido, telefono, semestre, promedio, serial = estudiante
-                lista_estudiates_ingenieria.append(ESTUDIANTE_INGENIERIA(cedula, nombre, apellido, telefono, semestre, promedio, serial))
-        with open("PracticaFinal/Estudiantes_Diseno.csv", "a+", newline="", encoding='utf-8') as Est_Dis_CSV:
-            Est_Dis_CSV.seek(0)
-            lector_dis = csv.reader(Est_Dis_CSV)
-            lista_estudiates_ingenieria = []
-            for registro in lector_dis:
-                cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial = registro
-                lista_estudiates_ingenieria.append(ESTUDIANTE_DISENO(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial))
-
-        Est_Ing_CSV.close()
-        Est_Dis_CSV.close()        
-
+        pass
     def inactivar_estudiantes(self):
         pass
     def mostrar_estudiantes(self):
-        with open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="", encoding='utf-8') as Est_Ing_CSV:
-            Est_Ing_CSV.seek(0)
-            lector_ing = csv.reader(Est_Ing_CSV)
-            for registro in lector_ing:
-                cedula, nombre, apellido, telefono, semestre, promedio, serial = registro
-                print(cedula, nombre, apellido, telefono, semestre, promedio, serial)
+        self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas
+#        with open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="", encoding='utf-8') as self.Estudiantes_ingenieria_csv:
+#            self.Estudiantes_ingenieria_csv.seek(0)
+#            self.lector_ingenieria = csv.reader(self.Estudiantes_ingenieria_csv)
+        for registro in self.Lector_Ingenieria:
+            cedula, nombre, apellido, telefono, semestre, promedio, serial = registro
+            print(cedula, nombre, apellido, telefono, semestre, promedio, serial)
 
-        with open("PracticaFinal/Estudiantes_Diseno.csv", "a+", newline="", encoding='utf-8') as Est_Dis_CSV:
-            Est_Dis_CSV.seek(0)
-            lector_dis = csv.reader(Est_Dis_CSV)
-            for registro in lector_dis:
-                cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial = registro
-                print(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial)
+#        with open("PracticaFinal/Estudiantes_Diseno.csv", "a+", newline="", encoding='utf-8') as self.Estudiantes_diseno_csv:
+#            self.Estudiantes_diseno_csv.seek(0)
+#            self.lector_diseno = csv.reader(self.Estudiantes_diseno_csv)
+        for registro in self.Lector_Diseno:
+            cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial = registro
+            print(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial)
 
-        Est_Ing_CSV.close()
-        Est_Dis_CSV.close()
+        self.Estudiantes_ingenieria_csv.close()
+        self.Estudiantes_diseno_csv.close()
 
 class Metodos_Equipos:
     def registrar_equipo(self):
