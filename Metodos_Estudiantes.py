@@ -1,111 +1,13 @@
 import csv
 import customtkinter as CTK
-
-class ESTUDIANTES:
-    def __init__(self, cedula, nombre, apellido, telefono):
-        self.cedula = cedula 
-        self.nombre = nombre 
-        self.apellido = apellido 
-        self.telefono = telefono
-
-class ESTUDIANTE_INGENIERIA(ESTUDIANTES):
-    def __init__(self, cedula, nombre, apellido, telefono, semestre, promedio, serial=""):
-        super().__init__(cedula, nombre, apellido, telefono)
-        self.semestre = semestre 
-        self.promedio = promedio 
-        self.serial = serial
-
-    def convertir_lista(self):
-        return [self.cedula,self.nombre,self.apellido,self.telefono,self.semestre,self.promedio,self.serial]
-        
-class ESTUDIANTE_DISENO(ESTUDIANTES):
-    def __init__(self, cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial=""):
-        super().__init__(cedula, nombre, apellido, telefono)
-        self.modalidad = modalidad 
-        self.cantidad_asignaturas = cantidad_asignaturas 
-        self.serial = serial
-
-    def convertir_lista(self):
-        return [self.cedula,self.nombre,self.apellido,self.telefono,self.modalidad,self.cantidad_asignaturas,self.serial]
-
-class DISPOSITIVOS:
-    def __init__(self, serial, marca, tamano, precio):
-        self.serial = serial 
-        self.marca = marca 
-        self.tamano = tamano 
-        self.precio = precio 
-    
-class TABLETA_GRAFICA(DISPOSITIVOS):
-    def __init__(self, serial, marca, tamano, precio, almacenamiento, peso):
-        super().__init__(serial, marca, tamano, precio)
-        self.almacenamiento = almacenamiento 
-        self.peso = peso
-
-    def convertir_lista(self):
-        return [self.serial,self.marca,self.tamano,self.precio,self.almacenamiento,self.peso]
-        
-class COMPUTADOR_PORTATIL(DISPOSITIVOS):
-    def __init__(self, serial, marca, tamano, precio, sistema_operativo, procesador):
-        super().__init__(serial, marca, tamano, precio)
-        self.sistema_operativo = sistema_operativo 
-        self.procesador = procesador
-
-    def convertir_lista(self):
-        return [self.serial,self.marca,self.tamano,self.precio,self.sistema_operativo,self.procesador]
-
-class PANTALLA_PRINCIPAL:
-    def __init__(self):
-        self.pagina_inicial = CTK.CTk()
-        self.pagina_inicial.geometry("+300+100")
-        self.pantalla_login()
-    
-    def pantalla_login(self):
-        objeto_lector_estudiantes = Metodos_Estudiantes()
-        objeto_lector_estudiantes.lector_csv_estudiantes() # Ejecución de método lector para usar las listas
-        def login_validacion():
-            cedula_busqueda = self.entrada_busqueda.get()
-            try:
-                cedula_busqueda = int(cedula_busqueda)
-            except ValueError:
-                self.etiqueta_busqueda_error.configure(text="Valor ingresado no valido")
-                self.etiqueta_busqueda_error.pack()
-                return
-            if cedula_busqueda == 1234:
-                self.pagina_inicial.title("EQUIPOS ELECTRÓNICOS SAN JUAN DE DIOS")
-                self.frame_pantalla_busqueda.destroy()
-                self.menu_administrador()
-            else:
-                self.etiqueta_busqueda_error.configure(text="Usuario no existe")
-                self.etiqueta_busqueda_error.pack()
-
-        self.frame_pantalla_busqueda = CTK.CTkFrame(self.pagina_inicial)
-        self.frame_pantalla_busqueda.pack()
-        
-        self.pagina_inicial.title("Login")
-        self.etiqueta_busqueda = CTK.CTkLabel(self.frame_pantalla_busqueda, text="Ingresa tu documento de identidad")
-        self.etiqueta_busqueda.pack(pady=10, padx=10)
-
-        self.entrada_busqueda = CTK.CTkEntry(self.frame_pantalla_busqueda)
-        self.entrada_busqueda.pack()
-
-        self.etiqueta_busqueda_error = CTK.CTkLabel(self.frame_pantalla_busqueda, text="")
-
-        self.boton_busqueda = CTK.CTkButton(self.frame_pantalla_busqueda, text="Buscar", command=login_validacion)
-        self.boton_busqueda.pack(pady=10, padx=10)
-        
-        objeto_lector_estudiantes.Estudiantes_ingenieria_csv.close()
-        objeto_lector_estudiantes.Estudiantes_diseno_csv.close()
-        
-    def menu_estudiantes(self):
-        objeto_prestamo_equipos = Metodos_Prestamos()
-        
-    def menu_administrador(self):
-        objeto_registro_estudiantes = Metodos_Estudiantes()
-        objeto_registro_estudiantes.registrar_estudiantes_validacion_carrera()
-        objeto_registro_equipos = Metodos_Equipos()
-        objeto_prestamo_equipos = Metodos_Prestamos()
+import Objetos
    
 class Metodos_Estudiantes:
+#    def __init__(self, Frame_Estudiantes_Principal):
+#        self.Frame_Estudiantes_Principal = Frame_Estudiantes_Principal
+#        self.Frame_Estudiantes = CTK.CTkFrame(self.Frame_Estudiantes_Principal)
+#        self.Frame_Estudiantes.pack()
+        
     def lector_csv_estudiantes(self):
         self.Estudiantes_ingenieria_csv = open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="", encoding='utf-8')
         self.Estudiantes_ingenieria_csv.seek(0)
@@ -119,8 +21,8 @@ class Metodos_Estudiantes:
             self.cedulas_estudiantes_ingenieria_lista.append(cedula)
 
         for estudiante in self.Lector_Ingenieria:
-            cedula, nombre, apellido, telefono, semestre, promedio, serial = estudiante
-            self.estudiantes_ingenieria_lista.append(ESTUDIANTE_INGENIERIA(cedula, nombre, apellido, telefono, semestre, promedio, serial))
+            cedula, nombre, apellido, telefono, semestre, promedio, estado, serial = estudiante
+            self.estudiantes_ingenieria_lista.append(Objetos.ESTUDIANTE_INGENIERIA(cedula, nombre, apellido, telefono, semestre, promedio, estado, serial))
                 
         self.Estudiantes_diseno_csv = open("PracticaFinal/Estudiantes_Diseno.csv", "a+", newline="", encoding='utf-8')
         self.Estudiantes_diseno_csv.seek(0)
@@ -134,26 +36,37 @@ class Metodos_Estudiantes:
             self.cedulas_estudiantes_diseno_lista.append(cedula)
 
         for registro in self.Lector_Diseno:
-            cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial = registro
-            self.estudiantes_diseno_lista.append(ESTUDIANTE_DISENO(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, serial))            
+            cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado, serial = registro
+            self.estudiantes_diseno_lista.append(Objetos.ESTUDIANTE_DISENO(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado, serial))
 
     def registrar_estudiantes_validacion_carrera(self):
+        def cerrar_registro_validacion():
+            self.ventana_registro_estudiantes.destroy()
         self.lector_csv_estudiantes()
         self.ventana_registro_estudiantes = CTK.CTkToplevel()
+#        self.ventana_registro_estudiantes = CTK.CTkFrame(self.Frame_Estudiantes)
         self.ventana_registro_estudiantes.geometry("+300+100")
+        self.ventana_registro_estudiantes.title("Registro estudiantes")
+        self.ventana_registro_estudiantes.minsize(300,200)
         self.ventana_registro_estudiantes.focus()
         self.ventana_registro_estudiantes.grab_set()
         self.frame_validacion_carrera = CTK.CTkFrame(self.ventana_registro_estudiantes)
-        self.frame_validacion_carrera.pack()
-        self.etiqueta_carrera = CTK.CTkLabel(self.frame_validacion_carrera, text="¿Qué carrera esta estudiando?")
-        self.etiqueta_carrera.grid()
-        self.desplegable_carrera = CTK.CTkComboBox(self.frame_validacion_carrera, values=["Ingeniería","Diseño"], state="readonly")
+        self.frame_validacion_carrera.pack(pady=20)
+        self.etiqueta_carrera = CTK.CTkLabel(self.frame_validacion_carrera, text="¿Qué carrera está estudiando?", font=(None,15))
+        self.etiqueta_carrera.grid(row=0, column=0, columnspan=2,padx=20,pady=10)
+        self.desplegable_carrera = CTK.CTkComboBox(self.frame_validacion_carrera, values=["Ingeniería","Diseño"], state="readonly", font=(None,15),width=225, height=33)
         self.desplegable_carrera.set("Ingeniería")
-        self.desplegable_carrera.grid()
-        self.boton_carrera = CTK.CTkButton(self.frame_validacion_carrera, text="Continuar", command=self.registro_segun_eleccion_carrera)
-        self.boton_carrera.grid()
+        self.desplegable_carrera.grid(row=1, column=0, columnspan=2, padx=5)
+        self.boton_cerrar_registro = CTK.CTkButton(self.frame_validacion_carrera, text="Cancelar", command=cerrar_registro_validacion, font=(None,15),width=100, height=33)
+        self.boton_cerrar_registro.grid(row=2, column=0, pady=10)
+        self.boton_carrera = CTK.CTkButton(self.frame_validacion_carrera, text="Continuar", command=self.registro_segun_eleccion_carrera, font=(None,15),width=100, height=33)
+        self.boton_carrera.grid(row=2, column=1, pady=10)
 
     def registro_segun_eleccion_carrera(self):
+        def cerrar_registro_segun_carrera():
+            self.ventana_registro_estudiantes.destroy()
+            self.registrar_estudiantes_validacion_carrera()
+        
         self.frame_eleccion_carrera = CTK.CTkFrame(self.ventana_registro_estudiantes)
         self.frame_eleccion_carrera.pack()
         self.eleccion_carrera = self.desplegable_carrera.get()
@@ -207,17 +120,22 @@ class Metodos_Estudiantes:
             self.desplegable_cantidad_materias.set(0)
             self.desplegable_cantidad_materias.grid(row=6,column=1,pady=5,padx=10)
         
+        self.boton_cerrar_registro_carrera = CTK.CTkButton(self.frame_eleccion_carrera, text="Volver", command=cerrar_registro_segun_carrera)
+        self.boton_cerrar_registro_carrera.grid(row=7,column=0,pady=5,padx=10)
         self.boton_validacion = CTK.CTkButton(self.frame_eleccion_carrera, text="Registrar", command=self.validacion_errores_registro)
-        self.boton_validacion.grid(row=7,column=0, columnspan=2,pady=5,padx=10)
+        self.boton_validacion.grid(row=7,column=1,pady=5,padx=10)
 
             
     def validacion_errores_registro(self):
         self.ventana_errores_registro = CTK.CTkToplevel()
         self.ventana_errores_registro.focus()
         self.ventana_errores_registro.grab_set()
-        self.ventana_errores_registro.geometry("+300+100")
-        self.frame_errores_registro = CTK.CTkScrollableFrame(self.ventana_errores_registro)
+        self.ventana_errores_registro.geometry("270x150+300+100")
+        self.ventana_errores_registro.resizable(False,False)
+        self.frame_errores_registro = CTK.CTkScrollableFrame(self.ventana_errores_registro,width=250)
         self.lista_errores_registro = []
+        self.mensaje_error = CTK.CTkLabel(self.ventana_errores_registro, text="", wraplength=245)
+        self.mensaje_error.pack(padx=10)
         
         if not self.entrada_cedula.get():
             self.lista_errores_registro.append("Ingresar cédula.")
@@ -248,59 +166,65 @@ class Metodos_Estudiantes:
         if len(self.lista_errores_registro) > 0:
 
             self.ventana_errores_registro.title("Error de registro")
-            self.mensaje_error = CTK.CTkLabel(self.ventana_errores_registro, text="Se presentan las siguientes inconsistencias en el registro: ")
-            self.mensaje_error.pack(pady=5,padx=10)
+            self.mensaje_error.configure(text="Inconsistencias detectadas:")
             self.frame_errores_registro.pack(pady=5,padx=10)
             for numero, elemento in enumerate(self.lista_errores_registro):
-                CTK.CTkLabel(self.frame_errores_registro, text=f"{numero+1}. {elemento}", justify="left", anchor="w").pack(padx=5,anchor="w")
+                CTK.CTkLabel(self.frame_errores_registro, text=f"{numero+1}. {elemento}", justify="left", anchor="w",wraplength=245).pack(padx=5,anchor="w")
             return
 
         else:
             if self.eleccion_carrera == "Ingeniería":
                 self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas
+                cedula = self.entrada_cedula.get()
+                nombre = self.entrada_nombre.get()
+                apellido = self.entrada_apellido.get()
+                telefono = self.entrada_telefono.get()
+                semestre = self.desplegable_semestre.get()
+                promedio = self.entrada_promedio.get()
+                registro_no_existe = True
                             
                 for registro_actual in self.cedulas_estudiantes_ingenieria_lista:
-                    if registro_actual == var_cedula:
-                        print("La persona ingresada ya se encuentra registrada.")
+                    if registro_actual == self.entrada_cedula.get():
+                        self.mensaje_error.configure(text=f"El documento {cedula} ya existe en el sistema.")
+                        registro_no_existe = False
                         break
-                    else:
-                        registro = ESTUDIANTE_INGENIERIA(var_cedula,var_nombre,var_apellido,var_telefono,var_semestre,var_promedio)
-                        self.Escritor_Ingenieria.writerow(registro.convertir_lista())
-                        print("Registro exitoso.")
-                        break
-                
-                if len(self.cedulas_estudiantes_ingenieria_lista) == 0:
-                    registro = ESTUDIANTE_INGENIERIA(var_cedula,var_nombre,var_apellido,var_telefono,var_semestre,var_promedio)
+                if registro_no_existe:
+                    registro = Objetos.ESTUDIANTE_INGENIERIA(cedula,nombre,apellido,telefono,semestre,promedio)
                     self.Escritor_Ingenieria.writerow(registro.convertir_lista())
-                    print("Registro exitoso.")
+                    self.mensaje_error.configure(text="El registro se ha completado exitosamente.", pady=55)
                 
-                self.Estudiantes_ingenieria_csv.close()
+                elif len(self.cedulas_estudiantes_ingenieria_lista) == 0:
+                    registro = Objetos.ESTUDIANTE_INGENIERIA(cedula,nombre,apellido,telefono,semestre,promedio)
+                    self.Escritor_Ingenieria.writerow(registro.convertir_lista())
+                    self.mensaje_error.configure(text="El registro se ha completado exitosamente.", pady=55)
                         
             elif self.eleccion_carrera == "Diseño":
                 self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas
-                var_cedula = input("Ingresa el/la cedula: ") 
-                var_nombre = input("Ingresa el/la nombre: ") 
-                var_apellido = input("Ingresa el/la apellido: ") 
-                var_telefono = input("Ingresa el/la telefono: ") 
-                var_modalidad = input("Ingresa el/la modalidad: ") 
-                var_cantidad_asignaturas = int(input("Ingresa el/la cantidad de asignaturas: "))
+                cedula = self.entrada_cedula.get()
+                nombre = self.entrada_nombre.get()
+                apellido = self.entrada_apellido.get()
+                telefono = self.entrada_telefono.get()
+                modalidad = self.desplegable_modalidad.get()
+                cantidad_materias = self.desplegable_cantidad_materias.get()
+                registro_no_existe = True
 
                 for registro_actual in self.cedulas_estudiantes_diseno_lista:
-                    if registro_actual == var_cedula:
-                        print("La persona ingresada ya se encuentra registrada.")
+                    if registro_actual == self.entrada_cedula.get():
+                        self.mensaje_error.configure(text=f"El documento {cedula} ya existe en el sistema.")
+                        registro_no_existe = False
                         break
-                    else:
-                        registro = ESTUDIANTE_DISENO(var_cedula,var_nombre,var_apellido,var_telefono,var_modalidad,var_cantidad_asignaturas)
-                        self.Escritor_Diseno.writerow(registro.convertir_lista())
-                        print("Registro exitoso.")
-                        break
+                if registro_no_existe:
+                    registro = Objetos.ESTUDIANTE_DISENO(cedula,nombre,apellido,telefono,modalidad,cantidad_materias)
+                    self.Escritor_Diseno.writerow(registro.convertir_lista())
+                    self.mensaje_error.configure(text="El registro se ha completado exitosamente.", pady=55)
                     
                 if len(self.cedulas_estudiantes_diseno_lista) == 0:
-                    registro = ESTUDIANTE_DISENO(var_cedula,var_nombre,var_apellido,var_telefono,var_modalidad,var_cantidad_asignaturas)
+                    registro = Objetos.ESTUDIANTE_DISENO(cedula,nombre,apellido,telefono,modalidad,cantidad_materias)
                     self.Escritor_Diseno.writerow(registro.convertir_lista())
-                    print("Registro exitoso.")
+                    self.mensaje_error.configure(text="El registro se ha completado exitosamente.", pady=55)
 
-                self.Estudiantes_diseno_csv.close()
+        self.Estudiantes_ingenieria_csv.close()
+        self.Estudiantes_diseno_csv.close()
         
     def modificar_estudiantes(self):
         pass
@@ -324,26 +248,3 @@ class Metodos_Estudiantes:
 
         self.Estudiantes_ingenieria_csv.close()
         self.Estudiantes_diseno_csv.close()
-
-class Metodos_Equipos:
-    def registrar_equipo(self):
-        pass
-    def modificar_equipo(self):
-        pass
-    def inactivar_equipo(self):
-        pass
-    def buscar_equipo(self):
-        pass
-class Metodos_Prestamos:
-    def registrar_prestamo(self):
-        pass
-    def modificar_prestamo(self):
-        pass
-    def devolución_prestamo(self):
-        pass
-    def devolución_prestamo(self):
-        pass
-    def devolución_prestamo(self):
-        pass
-    def devolución_prestamo(self):
-        pass
