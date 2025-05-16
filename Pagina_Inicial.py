@@ -5,14 +5,28 @@ class PANTALLA_PRINCIPAL:
     def __init__(self):
         self.pagina_inicial = CTK.CTk()
         self.pagina_inicial.geometry("+300+100")
+        self.pagina_inicial.resizable(False,False)
+        self.pantalla_login()
+
+    def boton_volver_login(self):
+        self.frame_botonera_izquierda.destroy()
+        self.Frame_Equipos_Principal.destroy()
+        self.Frame_Prestamos_Principal.destroy()
+        self.Frame_Estudiantes_Principal.destroy()
         self.pantalla_login()
     
     def pantalla_login(self):
         objeto_lector_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
         objeto_lector_estudiantes.lector_csv_estudiantes() # Ejecución de método lector para usar las listas
+
         def registrar_estudiante():
+            self.frame_pantalla_busqueda.destroy()
+            self.Frame_Estudiantes_Principal.grid(row=1, column=1, pady=10, padx=10, ipady=10, ipadx=10)
             objeto_registro_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
-            objeto_registro_estudiantes.registrar_estudiantes_validacion_carrera()
+            objeto_registro_estudiantes.registrar_estudiantes_validacion_carrera(self.Frame_Estudiantes_Principal)
+            boton_volver_iniciar_sesion = CTK.CTkButton(self.Frame_Estudiantes_Principal, text="Volver al inicio", command=self.boton_volver_login, width=170)
+            boton_volver_iniciar_sesion.pack()
+
         def login_validacion():
             cedula_busqueda = self.entrada_busqueda.get()
             try:
@@ -52,10 +66,15 @@ class PANTALLA_PRINCIPAL:
         objeto_lector_estudiantes.Estudiantes_ingenieria_csv.close()
         objeto_lector_estudiantes.Estudiantes_diseno_csv.close()
         
-        self.frame_botonera_izquierda = CTK.CTkFrame(self.pagina_inicial)
-        self.frame_panel_principal = CTK.CTkFrame(self.pagina_inicial)
-        
+        self.frame_botonera_izquierda = CTK.CTkFrame(self.pagina_inicial,width=500,height=300)
+
+        self.Frame_Estudiantes_Principal = CTK.CTkFrame(self.pagina_inicial)
+        self.Frame_Prestamos_Principal = CTK.CTkFrame(self.pagina_inicial)
+        self.Frame_Equipos_Principal = CTK.CTkFrame(self.pagina_inicial)
+    
+
     def menu_estudiantes(self):
+        self.pagina_inicial.geometry("800x500")
         def modificacion_estudiantes():
             objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
             objeto_estudiantes.modificar_estudiantes()
@@ -63,18 +82,20 @@ class PANTALLA_PRINCIPAL:
             objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos()
             objeto_prestamos.registrar_prestamo()
 
-        self.frame_botonera_izquierda.grid(row=1, column=0, pady=10, padx=10, ipady=10, ipadx=10)
-        self.frame_panel_principal.grid(row=1, column=1)
+        self.frame_botonera_izquierda.grid(row=1, column=0, ipady=10, ipadx=10)
         
         boton_modificacion_datos = CTK.CTkButton(self.frame_botonera_izquierda, text="Modificar", command=modificacion_estudiantes)
-        boton_modificacion_datos.pack()
+        boton_modificacion_datos.pack(pady=3, padx=10)
         boton_prestamo_equipos = CTK.CTkButton(self.frame_botonera_izquierda, text="Prestar equipo", command=registrar_prestamos)
-        boton_prestamo_equipos.pack()
+        boton_prestamo_equipos.pack(pady=3, padx=10)
+        boton_volver_iniciar_sesion = CTK.CTkButton(self.frame_botonera_izquierda, text="Volver al inicio", command=self.boton_volver_login)
+        boton_volver_iniciar_sesion.pack(pady=3, padx=10)
                 
     def menu_administrador(self):
+        self.pagina_inicial.geometry("800x500")
         def registrar_estudiantes():
             objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
-            objeto_estudiantes.registrar_estudiantes_validacion_carrera()
+            objeto_estudiantes.registrar_estudiantes_validacion_carrera(self.Frame_Estudiantes_Principal)
         def modificacion_estudiantes():
             objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
             objeto_estudiantes.modificar_estudiantes()
@@ -91,8 +112,8 @@ class PANTALLA_PRINCIPAL:
             objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos()
             objeto_prestamos.registrar_prestamo()
 
-        self.frame_botonera_izquierda.grid(row=1, column=0, pady=10, padx=10, ipady=10, ipadx=10)
-        self.frame_panel_principal.grid(row=1, column=1)
+        self.frame_botonera_izquierda.grid(row=1, column=0, ipady=10, ipadx=10)
+        self.Frame_Estudiantes_Principal.grid(row=1, column=1, pady=10, padx=10)
                 
         etiqueta_menu = CTK.CTkLabel(self.frame_botonera_izquierda, text="Panel de control",font=(None, 15))
         etiqueta_menu.pack(pady=5, padx=10)
@@ -108,7 +129,6 @@ class PANTALLA_PRINCIPAL:
         boton_registrar_equipos.pack(pady=3, padx=10)
         boton_registrar_prestamos = CTK.CTkButton(self.frame_botonera_izquierda, text="Registrar prestamos", command=registrar_prestamos)
         boton_registrar_prestamos.pack(pady=3, padx=10)
+        boton_volver_iniciar_sesion = CTK.CTkButton(self.frame_botonera_izquierda, text="Volver al inicio", command=self.boton_volver_login)
+        boton_volver_iniciar_sesion.pack(pady=3, padx=10)
 
-#        self.Frame_Estudiantes_Principal = Metodos_Estudiantes.Metodos_Estudiantes(self.frame_panel_principal)
-#        self.Frame_Prestamos_Principal = Metodos_Prestamos.Metodos_Prestamos(self.frame_panel_principal)
-#        self.Frame_Equipos_Principal = Metodos_Equipos.Metodos_Equipos(self.frame_panel_principal)
