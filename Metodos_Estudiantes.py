@@ -1,13 +1,9 @@
 import csv
 import customtkinter as CTK
 import Objetos
+import Pagina_Inicial
    
-class Metodos_Estudiantes:
-#    def __init__(self, Frame_Estudiantes_Principal):
-#        self.Frame_Estudiantes_Principal = Frame_Estudiantes_Principal
-#        self.Frame_Estudiantes = CTK.CTkFrame(self.Frame_Estudiantes_Principal)
-#        self.Frame_Estudiantes.pack()
-        
+class Metodos_Estudiantes:        
     def lector_csv_estudiantes(self):
         self.Estudiantes_ingenieria_csv = open("PracticaFinal/Estudiantes_Ingenieria.csv", "a+", newline="", encoding='utf-8')
         self.Estudiantes_ingenieria_csv.seek(0)
@@ -39,34 +35,23 @@ class Metodos_Estudiantes:
             cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado, serial = registro
             self.estudiantes_diseno_lista.append(Objetos.ESTUDIANTE_DISENO(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado, serial))
 
-    def registrar_estudiantes_validacion_carrera(self):
-        def cerrar_registro_validacion():
-            self.ventana_registro_estudiantes.destroy()
+    def registrar_estudiantes_validacion_carrera(self,ventana_registro_estudiantes):
+            
         self.lector_csv_estudiantes()
-        self.ventana_registro_estudiantes = CTK.CTkToplevel()
-#        self.ventana_registro_estudiantes = CTK.CTkFrame(self.Frame_Estudiantes)
-        self.ventana_registro_estudiantes.geometry("+300+100")
-        self.ventana_registro_estudiantes.title("Registro estudiantes")
-        self.ventana_registro_estudiantes.minsize(300,200)
-        self.ventana_registro_estudiantes.focus()
-        self.ventana_registro_estudiantes.grab_set()
+        self.ventana_registro_estudiantes = CTK.CTkFrame(ventana_registro_estudiantes)
+        self.ventana_registro_estudiantes.pack()
         self.frame_validacion_carrera = CTK.CTkFrame(self.ventana_registro_estudiantes)
-        self.frame_validacion_carrera.pack(pady=20)
-        self.etiqueta_carrera = CTK.CTkLabel(self.frame_validacion_carrera, text="¿Qué carrera está estudiando?", font=(None,15))
+        self.frame_validacion_carrera.pack()
+        self.etiqueta_carrera = CTK.CTkLabel(self.frame_validacion_carrera, text="¿Qué carrera está estudiando?")
         self.etiqueta_carrera.grid(row=0, column=0, columnspan=2,padx=20,pady=10)
-        self.desplegable_carrera = CTK.CTkComboBox(self.frame_validacion_carrera, values=["Ingeniería","Diseño"], state="readonly", font=(None,15),width=225, height=33)
+        self.desplegable_carrera = CTK.CTkComboBox(self.frame_validacion_carrera, values=["Ingeniería","Diseño"], state="readonly",width=200, height=33)
         self.desplegable_carrera.set("Ingeniería")
         self.desplegable_carrera.grid(row=1, column=0, columnspan=2, padx=5)
-        self.boton_cerrar_registro = CTK.CTkButton(self.frame_validacion_carrera, text="Cancelar", command=cerrar_registro_validacion, font=(None,15),width=100, height=33)
-        self.boton_cerrar_registro.grid(row=2, column=0, pady=10)
-        self.boton_carrera = CTK.CTkButton(self.frame_validacion_carrera, text="Continuar", command=self.registro_segun_eleccion_carrera, font=(None,15),width=100, height=33)
-        self.boton_carrera.grid(row=2, column=1, pady=10)
+        self.boton_carrera = CTK.CTkButton(self.frame_validacion_carrera, text="Continuar", command=self.registro_segun_eleccion_carrera, width=170)
+        self.boton_carrera.grid(row=2, column=0, columnspan=2, pady=10)
 
     def registro_segun_eleccion_carrera(self):
-        def cerrar_registro_segun_carrera():
-            self.ventana_registro_estudiantes.destroy()
-            self.registrar_estudiantes_validacion_carrera()
-        
+                
         self.frame_eleccion_carrera = CTK.CTkFrame(self.ventana_registro_estudiantes)
         self.frame_eleccion_carrera.pack()
         self.eleccion_carrera = self.desplegable_carrera.get()
@@ -91,7 +76,7 @@ class Metodos_Estudiantes:
 
         if self.eleccion_carrera == "Ingeniería":
             
-            self.etiqueta_carrera = CTK.CTkLabel(self.frame_eleccion_carrera, text=self.eleccion_carrera)
+            self.etiqueta_carrera = CTK.CTkLabel(self.frame_eleccion_carrera, text=f"Registro estudiante: {self.eleccion_carrera}")
             self.etiqueta_carrera.grid(row=0, column=0,pady=5,padx=10, columnspan=2)
             
             self.etiqueta_semestre = CTK.CTkLabel(self.frame_eleccion_carrera, text="Semestre")
@@ -106,7 +91,7 @@ class Metodos_Estudiantes:
 
         elif self.eleccion_carrera == "Diseño":
 
-            self.etiqueta_carrera = CTK.CTkLabel(self.frame_eleccion_carrera, text=self.eleccion_carrera)
+            self.etiqueta_carrera = CTK.CTkLabel(self.frame_eleccion_carrera, text=f"Registro estudiante: {self.eleccion_carrera}")
             self.etiqueta_carrera.grid(row=0, column=0,pady=5,padx=10, columnspan=2)
             
             self.etiqueta_modalidad = CTK.CTkLabel(self.frame_eleccion_carrera, text="Modalidad")
@@ -120,10 +105,8 @@ class Metodos_Estudiantes:
             self.desplegable_cantidad_materias.set(0)
             self.desplegable_cantidad_materias.grid(row=6,column=1,pady=5,padx=10)
         
-        self.boton_cerrar_registro_carrera = CTK.CTkButton(self.frame_eleccion_carrera, text="Volver", command=cerrar_registro_segun_carrera)
-        self.boton_cerrar_registro_carrera.grid(row=7,column=0,pady=5,padx=10)
-        self.boton_validacion = CTK.CTkButton(self.frame_eleccion_carrera, text="Registrar", command=self.validacion_errores_registro)
-        self.boton_validacion.grid(row=7,column=1,pady=5,padx=10)
+        self.boton_validacion = CTK.CTkButton(self.frame_eleccion_carrera, text="Registrar", command=self.validacion_errores_registro, width=170)
+        self.boton_validacion.grid(row=7,column=0, columnspan=2,pady=5,padx=10)
 
             
     def validacion_errores_registro(self):
@@ -169,7 +152,7 @@ class Metodos_Estudiantes:
             self.mensaje_error.configure(text="Inconsistencias detectadas:")
             self.frame_errores_registro.pack(pady=5,padx=10)
             for numero, elemento in enumerate(self.lista_errores_registro):
-                CTK.CTkLabel(self.frame_errores_registro, text=f"{numero+1}. {elemento}", justify="left", anchor="w",wraplength=245).pack(padx=5,anchor="w")
+                CTK.CTkLabel(self.frame_errores_registro, text=f"{numero+1}. {elemento}", justify="left", anchor="w",wraplength=225).pack(padx=5,anchor="w")
             return
 
         else:
