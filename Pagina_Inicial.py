@@ -64,10 +64,7 @@ class PANTALLA_PRINCIPAL:
         
         self.boton_salir_busqueda = CTK.CTkButton(self.frame_pantalla_busqueda, text="Registrarse", font=(None,15), command=registrar_estudiante,width=300,height=33)
         self.boton_salir_busqueda.grid(row=4,column=0,pady=5, padx=10)
-        
-        objeto_lector_estudiantes.Estudiantes_ingenieria_csv.close()
-        objeto_lector_estudiantes.Estudiantes_diseno_csv.close()
-        
+                
         self.Frame_Botonera_Izquierda = CTK.CTkFrame(self.pagina_inicial,fg_color="transparent",width=150)
         self.Frame_Contenedor_Principal = CTK.CTkScrollableFrame(self.pagina_inicial)
     
@@ -99,26 +96,38 @@ class PANTALLA_PRINCIPAL:
             limpiar_contenedor()
             objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
             objeto_estudiantes.registrar_estudiantes_validacion_carrera(self.Frame_Contenedor_Principal)
-        def modificacion_estudiantes():
+        def modificar_estudiantes():
             limpiar_contenedor()
             objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
             objeto_estudiantes.busqueda_estudiantes(self.Frame_Contenedor_Principal)
-        def estado_estudiantes():
-            limpiar_contenedor()
-            objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
-            objeto_estudiantes.inactivar_estudiantes()       
         def mostrar_estudiantes():
             limpiar_contenedor()
             objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
-            objeto_estudiantes.mostrar_estudiantes()
+            objeto_estudiantes.mostrar_estudiantes(self.Frame_Contenedor_Principal)
         def registrar_equipos():
             limpiar_contenedor()
             objeto_equipos = Metodos_Equipos.Metodos_Equipos()
-            objeto_equipos.registrar_equipo()
+#            objeto_equipos.registrar_equipo()
+        def modificar_equipos():
+            limpiar_contenedor()
+            objeto_equipos = Metodos_Equipos.Metodos_Equipos()
+#            objeto_equipos.registrar_equipo()
+        def mostrar_equipos():
+            limpiar_contenedor()
+            objeto_equipos = Metodos_Equipos.Metodos_Equipos()
+#            objeto_equipos.registrar_equipo()
         def registrar_prestamos():
             limpiar_contenedor()
             objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos()
-            objeto_prestamos.registrar_prestamo()
+#            objeto_prestamos.registrar_prestamo()
+        def modificar_prestamos():
+            limpiar_contenedor()
+            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos()
+#            objeto_prestamos.registrar_prestamo()
+        def mostrar_prestamos():
+            limpiar_contenedor()
+            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos()
+#            objeto_prestamos.registrar_prestamo()
 
         self.Frame_Botonera_Izquierda.pack(side="left", ipady=10, ipadx=10, fill="y", expand=False)
         self.Frame_Contenedor_Principal.pack(side="left", pady=10, padx=10, fill="both", expand=True)
@@ -130,16 +139,22 @@ class PANTALLA_PRINCIPAL:
         etiqueta_menu.pack(pady=5, padx=10)
         boton_registar_estudiantes = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Registar estudiantes", command=registrar_estudiantes)
         boton_registar_estudiantes.pack(pady=3, padx=10)
-        boton_modificar_datos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Modificar datos", command=modificacion_estudiantes)
-        boton_modificar_datos.pack(pady=3, padx=10)
-        boton_cambiar_estado_estudiantes = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Estado estudiantes", command=estado_estudiantes)
-        boton_cambiar_estado_estudiantes.pack(pady=3, padx=10)
+        boton_modificar_estudiantes = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Modificar estudiantes", command=modificar_estudiantes)
+        boton_modificar_estudiantes.pack(pady=3, padx=10)
         boton_mostrar_estudiantes = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Mostrar estudiantes", command=mostrar_estudiantes)
         boton_mostrar_estudiantes.pack(pady=3, padx=10)
         boton_registrar_equipos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Registrar equipos", command=registrar_equipos)
         boton_registrar_equipos.pack(pady=3, padx=10)
+        boton_modificar_equipos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Modificar equipos", command=modificar_equipos)
+        boton_modificar_equipos.pack(pady=3, padx=10)
+        boton_mostrar_equipos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Mostrar equipos", command=mostrar_equipos)
+        boton_mostrar_equipos.pack(pady=3, padx=10)
         boton_registrar_prestamos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Registrar prestamos", command=registrar_prestamos)
         boton_registrar_prestamos.pack(pady=3, padx=10)
+        boton_modificar_prestamos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Modificar prestamos", command=modificar_prestamos)
+        boton_modificar_prestamos.pack(pady=3, padx=10)
+        boton_mostrar_prestamos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Mostrar prestamos", command=mostrar_prestamos)
+        boton_mostrar_prestamos.pack(pady=3, padx=10)
         boton_volver_iniciar_sesion = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Volver al inicio", command=self.boton_volver_login)
         boton_volver_iniciar_sesion.pack(pady=3, padx=10)
 
