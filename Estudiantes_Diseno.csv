@@ -1,4 +1,4 @@
-cedula,nombre,apellido,telefono,modalidad,cantidad_asignaturas,estado,serial
+CÉDULA,NOMBRE,APELLIDO,TELÉFONO,MODALIDAD,CANTIDAD ASIGNATURAS,ESTADO,SERIAL
 20123456,Bruno,Ledezma,04241230011,Virtual,4,ACTIVO,SRL021
 20234567,Isabel,Coronado,04161230012,Presencial,5,ACTIVO,SRL022
 20345678,Raúl,Bermúdez,04261230013,Mixta,6,ACTIVO,SRL023
@@ -19,3 +19,4 @@ cedula,nombre,apellido,telefono,modalidad,cantidad_asignaturas,estado,serial
 21890123,Renata,Gil,04151230028,Mixta,5,ACTIVO,SRL038
 21901234,Leonardo,Benítez,04231230029,Virtual,6,ACTIVO,SRL039
 22012345,Florencia,Peña,04161230030,Presencial,4,ACTIVO,SRL040
+1034916252,Yeison,Bran,3015697575,Virtual,1,ACTIVO,
