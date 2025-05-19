@@ -13,7 +13,7 @@ class ESTUDIANTE_INGENIERIA(ESTUDIANTES):
         self.semestre = semestre 
         self.promedio = promedio 
 
-    def convertir_lista(self):
+    def convertir_lista_ingenieria(self):
         return [self.cedula,self.nombre,self.apellido,self.telefono,self.semestre,self.promedio,self.estado,self.serial]
         
 class ESTUDIANTE_DISENO(ESTUDIANTES):
@@ -22,7 +22,7 @@ class ESTUDIANTE_DISENO(ESTUDIANTES):
         self.modalidad = modalidad 
         self.cantidad_asignaturas = cantidad_asignaturas 
 
-    def convertir_lista(self):
+    def convertir_lista_diseno(self):
         return [self.cedula,self.nombre,self.apellido,self.telefono,self.modalidad,self.cantidad_asignaturas,self.estado,self.serial]
 
 class DISPOSITIVOS:
@@ -39,7 +39,7 @@ class TABLETA_GRAFICA(DISPOSITIVOS):
         self.almacenamiento = almacenamiento 
         self.peso = peso
 
-    def convertir_lista(self):
+    def convertir_lista_tableta(self):
         return [self.serial,self.marca,self.tamano,self.precio,self.almacenamiento,self.peso,self.estado]
         
 class COMPUTADOR_PORTATIL(DISPOSITIVOS):
@@ -48,5 +48,5 @@ class COMPUTADOR_PORTATIL(DISPOSITIVOS):
         self.sistema_operativo = sistema_operativo 
         self.procesador = procesador
 
-    def convertir_lista(self):
+    def convertir_lista_computador(self):
         return [self.serial,self.marca,self.tamano,self.precio,self.sistema_operativo,self.procesador,self.estado]

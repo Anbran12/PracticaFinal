@@ -33,12 +33,12 @@ class Metodos_Estudiantes:
             with open("PracticaFinal/Estudiantes_Ingenieria.csv", "w", newline="", encoding='utf-8') as Estudiantes_ingenieria_csv:
                 Escritor_Ingenieria = csv.writer(Estudiantes_ingenieria_csv)
                 for estudiante in self.estudiantes_ingenieria_lista:
-                    Escritor_Ingenieria.writerow(estudiante.convertir_lista())
+                    Escritor_Ingenieria.writerow(estudiante.convertir_lista_ingenieria())
 
             with open("PracticaFinal/Estudiantes_Diseno.csv", "w", newline="", encoding='utf-8') as Estudiantes_diseno_csv:
                 Escritor_Diseno = csv.writer(Estudiantes_diseno_csv)
                 for estudiante in self.estudiantes_diseno_lista:
-                    Escritor_Diseno.writerow(estudiante.convertir_lista())
+                    Escritor_Diseno.writerow(estudiante.convertir_lista_diseno())
 
     def registrar_estudiantes_validacion_carrera(self,ventana_registro_estudiantes):
 
@@ -379,40 +379,44 @@ class Metodos_Estudiantes:
         def mostrar_estudiantes_segun_carrera(carrera):
             pantalla_validacion_carrera.destroy()
             pantalla_mostrar_registros.pack(pady=10)
+            
             if carrera == "Ingeniería":
-                for numero_registro, registro in enumerate(self.estudiantes_ingenieria_lista):
-                    if numero_registro == 1:
-                        for numero, dato in enumerate(registro.convertir_lista()):
-                            CTK.CTkLabel(pantalla_mostrar_registros, text=dato, wraplength=85).grid(row=numero_registro+1, column=numero, padx=3, pady=3)
-                    else:
-                        for numero, dato in enumerate(registro.convertir_lista()):
-                            etiqueta_registro = CTK.CTkLabel(pantalla_mostrar_registros, text=dato, wraplength=85)
-                            etiqueta_registro.grid(row=numero_registro+1, column=numero, padx=3, pady=3)
-                            if numero_registro % 2 == 0:
-                                etiqueta_registro.configure()
-
-                    print(registro.cedula, registro.nombre, registro.apellido, registro.telefono, registro.semestre, registro.promedio, registro.serial)
-
+                lista = self.estudiantes_ingenieria_lista
             if carrera == "Diseño":
-                for numero_registro, registro in enumerate(self.estudiantes_diseno_lista):
-                    if numero_registro == 1:
-                        for numero, dato in enumerate(registro.convertir_lista()):
-                            CTK.CTkLabel(pantalla_mostrar_registros, text=dato, wraplength=85).grid(row=numero_registro+1, column=numero, padx=3, pady=3)
-                    else:
-                        for numero, dato in enumerate(registro.convertir_lista()):
-                            etiqueta_registro = CTK.CTkLabel(pantalla_mostrar_registros, text=dato, wraplength=85)
-                            etiqueta_registro.grid(row=numero_registro+1, column=numero, padx=3, pady=3)
-                            if numero_registro % 2 == 0:
-                                etiqueta_registro.configure()
-                    
-                    print(registro.cedula, registro.nombre, registro.apellido, registro.telefono, registro.modalidad, registro.cantidad_asignaturas, registro.serial)        
+                lista = self.estudiantes_diseno_lista
+            
+            for numero_registro, registro in enumerate(lista):
+                try:
+                    registro_lista = registro.convertir_lista_ingenieria()
+                except:
+                    try:
+                        registro_lista = registro.convertir_lista_diseno()
+                    except:
+                        etiqueta_error_conversion = CTK.CTkLabel(pantalla_validacion_carrera, text="Error al convertir a listas.", height=15)
+                        etiqueta_error_conversion.grid(row=2, column=0, columnspan=3, padx=3)
+                
+                if numero_registro % 2 == 1:
+                    color_fondo = "#4b4b4b" 
+                else:
+                    color_fondo = None
+                        
+                if numero_registro == 0:
+                    for numero, dato in enumerate(registro_lista):
+                        CTK.CTkLabel(pantalla_mostrar_registros, text=dato, fg_color=color_fondo, height= 33, width=70, wraplength=70).grid(row=numero_registro+1, column=numero, pady=3)
+                else:
+                    for numero, dato in enumerate(registro_lista):
+                        etiqueta_entrada_registro = CTK.CTkEntry(pantalla_mostrar_registros, fg_color=color_fondo, height= 33, width=70, corner_radius=0, border_width=0)
+                        etiqueta_entrada_registro.insert(0,dato)
+                        etiqueta_entrada_registro.configure(state="readonly")
+                        etiqueta_entrada_registro.grid(row=numero_registro+1, column=numero)
         
         def mostar_estudiantes_boton():
             mostrar_estudiantes_segun_carrera(desplegable_carrera.get())
             
         etiqueta_carrera = CTK.CTkLabel(pantalla_validacion_carrera, text="Seleccionar carrera")
         etiqueta_carrera.grid(row=0, column=0, padx=10)
-        desplegable_carrera = CTK.CTkComboBox(pantalla_validacion_carrera, values=["Ingeniería","Diseño"])
+        desplegable_carrera = CTK.CTkComboBox(pantalla_validacion_carrera, values=["Ingeniería","Diseño"], state="readonly")
+        desplegable_carrera.set("Ingeniería")
         desplegable_carrera.grid(row=0, column=1, padx=10)
         boton_buscar_carrera = CTK.CTkButton(pantalla_validacion_carrera, text="🔍", font=(None,20), width=28, command=mostar_estudiantes_boton)
         boton_buscar_carrera.grid(row=0, column=2, padx=10)
