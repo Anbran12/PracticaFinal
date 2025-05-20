@@ -58,12 +58,12 @@ class PANTALLA_PRINCIPAL:
         # Buscar en Ingeniería
             for persona_actual in self.estudiantes_ingenieria_lista:
                 if persona_actual.cedula == cedula_buscar:
-                    return persona_actual
+                    return persona_actual, "Ingeniería"
                 
         # Buscar en Diseño
             for persona_actual in self.estudiantes_diseno_lista:
                 if persona_actual.cedula == cedula_buscar:
-                    return persona_actual
+                    return persona_actual, "Diseño"
 
     def pantalla_login(self):
         def registrar_estudiante():
@@ -90,8 +90,8 @@ class PANTALLA_PRINCIPAL:
                 if self.lector_csv_estudiantes(buscar=True, cedula_buscar=cedula_busqueda):                    
                     self.pagina_inicial.title("EQUIPOS ELECTRÓNICOS SAN JUAN DE DIOS")
                     self.frame_pantalla_busqueda.destroy()
-                    extraer_nombre_estudiante = self.lector_csv_estudiantes(buscar=False,nombre_estudiante=True,cedula_buscar=cedula_busqueda)
-                    self.menu_administrador(nombre_estudiante=extraer_nombre_estudiante.nombre)
+                    informacion_estudiante, carrera_estudiante = self.lector_csv_estudiantes(buscar=False,nombre_estudiante=True,cedula_buscar=cedula_busqueda)
+                    self.menu_administrador(informacion_estudiante_login=informacion_estudiante, carrera_estudiante_login=carrera_estudiante)
                 else:
                     self.entrada_busqueda.configure(border_color="gray")
                     self.etiqueta_busqueda_error.configure(text=f"El usuario {cedula_busqueda} se encuentra inactivo, contacte al administrador")
@@ -123,7 +123,6 @@ class PANTALLA_PRINCIPAL:
         self.Frame_Botonera_Izquierda = CTK.CTkFrame(self.pagina_inicial,fg_color="transparent",width=150)
         self.Frame_Contenedor_Principal = CTK.CTkScrollableFrame(self.pagina_inicial)
     
-
     def menu_estudiantes(self):
         self.pagina_inicial.geometry("800x500")
         def modificacion_estudiantes():
@@ -142,7 +141,7 @@ class PANTALLA_PRINCIPAL:
         boton_volver_iniciar_sesion = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Volver al inicio", command=self.boton_volver_login)
         boton_volver_iniciar_sesion.pack(pady=3, padx=10)
                 
-    def menu_administrador(self, nombre_estudiante=None):
+    def menu_administrador(self, informacion_estudiante_login=None, carrera_estudiante_login=None):
         self.pagina_inicial.geometry("800x500")
         def limpiar_contenedor():
             for elemento in self.Frame_Contenedor_Principal.winfo_children():
@@ -174,7 +173,7 @@ class PANTALLA_PRINCIPAL:
         def registrar_prestamos():
             limpiar_contenedor()
             objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos()
-#            objeto_prestamos.registrar_prestamo()
+            objeto_prestamos.registrar_prestamo_validacion_carrera(self.Frame_Contenedor_Principal,informacion_estudiante=informacion_estudiante_login, carrera_estudiante=carrera_estudiante_login)
         def modificar_prestamos():
             limpiar_contenedor()
             objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos()
@@ -190,7 +189,7 @@ class PANTALLA_PRINCIPAL:
 #        self.Frame_Botonera_Izquierda.grid(row=1, column=0, ipady=10, ipadx=10)
 #        self.Frame_Contenedor_Principal.grid(row=1, column=1, pady=10, padx=10)
                 
-        etiqueta_nombre = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text=f"Hola {nombre_estudiante}",font=(None, 15))
+        etiqueta_nombre = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text=f"Hola {informacion_estudiante_login.nombre}",font=(None, 15))
         etiqueta_nombre.pack(pady=3, padx=10)
         etiqueta_menu = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text="Panel de control",font=(None, 15))
         etiqueta_menu.pack(pady=5, padx=10)
