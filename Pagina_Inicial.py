@@ -17,7 +17,7 @@ class PANTALLA_PRINCIPAL:
     def lector_csv_estudiantes(self, buscar=False, nombre_estudiante=False, cedula_buscar=None):
         self.cedulas_estudiantes_ingenieria_lista = []
         self.estudiantes_ingenieria_lista = []
-        with open("Estudiantes_Ingenieria.csv", "r", newline="", encoding='utf-8') as Estudiantes_ingenieria_csv:
+        with open("PracticaFinal/Estudiantes_Ingenieria.csv", "r", newline="", encoding='utf-8') as Estudiantes_ingenieria_csv:
             Lector_Ingenieria = csv.reader(Estudiantes_ingenieria_csv)
             # Crea un lista con los valores extraidos, (lista de cédulas de ingenieria)
             for estudiante in Lector_Ingenieria:
@@ -28,7 +28,7 @@ class PANTALLA_PRINCIPAL:
 
         self.cedulas_estudiantes_diseno_lista = []
         self.estudiantes_diseno_lista = []
-        with open("Estudiantes_Diseno.csv", "r", newline="", encoding='utf-8') as Estudiantes_diseno_csv:
+        with open("PracticaFinal/Estudiantes_Diseno.csv", "r", newline="", encoding='utf-8') as Estudiantes_diseno_csv:
             Lector_Diseno = csv.reader(Estudiantes_diseno_csv)
             # Crea un lista con los valores extraidos, (lista de cédulas de diseño)
             for estudiante in Lector_Diseno:
@@ -160,39 +160,28 @@ class PANTALLA_PRINCIPAL:
             objeto_estudiantes.mostrar_estudiantes(self.Frame_Contenedor_Principal)
         def registrar_equipos():
             limpiar_contenedor()
-            objeto_equipos = Metodos_Equipos.Metodos_Equipos(self.Frame_Contenedor_Principal)
-            objeto_equipos.registrar_equipo()
-
+            objeto_equipos = Metodos_Equipos.Metodos_Equipos()
+#            objeto_equipos.registrar_equipo()
         def modificar_equipos():
             limpiar_contenedor()
-            objeto_equipos = Metodos_Equipos.Metodos_Equipos(self.Frame_Contenedor_Principal)
-            objeto_equipos.modificar_equipo()
-
+            objeto_equipos = Metodos_Equipos.Metodos_Equipos()
+#            objeto_equipos.registrar_equipo()
         def mostrar_equipos():
             limpiar_contenedor()
-            objeto_equipos = Metodos_Equipos.Metodos_Equipos(self.Frame_Contenedor_Principal)
-            objeto_equipos.mostrar_equipos()
-
+            objeto_equipos = Metodos_Equipos.Metodos_Equipos()
+#            objeto_equipos.registrar_equipo()
         def registrar_prestamos():
             limpiar_contenedor()
-            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos(self.Frame_Contenedor_Principal)
-            objeto_prestamos.registrar_prestamo_validacion_carrera(
-                self.Frame_Contenedor_Principal,
-                informacion_estudiante=informacion_estudiante_login,
-                carrera_estudiante=carrera_estudiante_login
-            )
-
+            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos()
+            objeto_prestamos.registrar_prestamo_validacion_carrera(self.Frame_Contenedor_Principal,informacion_estudiante=informacion_estudiante_login, carrera_estudiante=carrera_estudiante_login)
         def modificar_prestamos():
             limpiar_contenedor()
-            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos(self.Frame_Contenedor_Principal)
-            objeto_prestamos.modificar_prestamo()
-
+            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos()
+#            objeto_prestamos.registrar_prestamo()
         def mostrar_prestamos():
             limpiar_contenedor()
-            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos(self.Frame_Contenedor_Principal)
-            objeto_prestamos.mostrar_prestamos()
-
-
+            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos()
+#            objeto_prestamos.registrar_prestamo()
 
         self.Frame_Botonera_Izquierda.pack(side="left", ipady=10, ipadx=10, fill="y", expand=False)
         self.Frame_Contenedor_Principal.pack(side="left", pady=10, padx=10, fill="both", expand=True)
