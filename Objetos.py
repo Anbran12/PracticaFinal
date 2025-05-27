@@ -5,7 +5,7 @@ class ESTUDIANTES:
         self.apellido = apellido 
         self.telefono = telefono
         self.estado = estado
-        self.serial = serial
+        self.serial = serial 
 
 class ESTUDIANTE_INGENIERIA(ESTUDIANTES):
     def __init__(self, cedula, nombre, apellido, telefono, semestre, promedio, estado="ACTIVO", serial=""):

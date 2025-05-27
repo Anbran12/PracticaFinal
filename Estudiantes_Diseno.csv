@@ -18,4 +18,4 @@ Cédula,Nombre,Apellido,Teléfono,Modalidad,Cantidad Asignaturas,Estado,Serial
 21789012,Hugo,Mejía,4141230027,Presencial,4,ACTIVO,SRL037
 21890123,Renata,Gil,4151230028,Mixta,5,ACTIVO,SRL038
 21901234,Leonardo,Benítez,4231230029,Virtual,6,ACTIVO,SRL039
-22012345,Florencia,Peña,4161230030,Presencial,4,ACTIVO,SRL040
+22012345,Florencia,Peña,4161230030,Presencial,4,INACTIVO,

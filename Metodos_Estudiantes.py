@@ -430,4 +430,4 @@ class Metodos_Estudiantes:
         desplegable_carrera.set("Ingeniería")
         desplegable_carrera.grid(row=0, column=1, padx=10)
         boton_buscar_carrera = CTK.CTkButton(pantalla_validacion_carrera, text="🔍", font=(None,20), width=28, command=mostar_estudiantes_boton)
-        boton_buscar_carrera.grid(row=0, column=2, padx=10)
+        boton_buscar_carrera.grid(row=0, column=2, padx=10) 
