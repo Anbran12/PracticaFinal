@@ -9,7 +9,7 @@ class Metodos_Estudiantes:
         if leer_archivo:
             self.cedulas_estudiantes_ingenieria_lista = []
             self.estudiantes_ingenieria_lista = []
-            with open("PracticaFinal/Estudiantes_Ingenieria.csv", "r", newline="", encoding='utf-8') as Estudiantes_ingenieria_csv:
+            with open("Estudiantes_Ingenieria.csv", "r", newline="", encoding='utf-8') as Estudiantes_ingenieria_csv:
                 Lector_Ingenieria = csv.reader(Estudiantes_ingenieria_csv)
                 # Crea un lista con los valores extraidos, (lista de cédulas de ingenieria)
                 for estudiante in Lector_Ingenieria:
@@ -20,7 +20,7 @@ class Metodos_Estudiantes:
 
             self.cedulas_estudiantes_diseno_lista = []
             self.estudiantes_diseno_lista = []
-            with open("PracticaFinal/Estudiantes_Diseno.csv", "r", newline="", encoding='utf-8') as Estudiantes_diseno_csv:
+            with open("Estudiantes_Diseno.csv", "r", newline="", encoding='utf-8') as Estudiantes_diseno_csv:
                 Lector_Diseno = csv.reader(Estudiantes_diseno_csv)
                 # Crea un lista con los valores extraidos, (lista de cédulas de diseño)
                 for estudiante in Lector_Diseno:
@@ -30,12 +30,12 @@ class Metodos_Estudiantes:
                     self.estudiantes_diseno_lista.append(Objetos.ESTUDIANTE_DISENO(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado, serial))
                 
         if modificar:
-            with open("PracticaFinal/Estudiantes_Ingenieria.csv", "w", newline="", encoding='utf-8') as Estudiantes_ingenieria_csv:
+            with open("Estudiantes_Ingenieria.csv", "w", newline="", encoding='utf-8') as Estudiantes_ingenieria_csv:
                 Escritor_Ingenieria = csv.writer(Estudiantes_ingenieria_csv)
                 for estudiante in self.estudiantes_ingenieria_lista:
                     Escritor_Ingenieria.writerow(estudiante.convertir_lista_ingenieria())
 
-            with open("PracticaFinal/Estudiantes_Diseno.csv", "w", newline="", encoding='utf-8') as Estudiantes_diseno_csv:
+            with open("Estudiantes_Diseno.csv", "w", newline="", encoding='utf-8') as Estudiantes_diseno_csv:
                 Escritor_Diseno = csv.writer(Estudiantes_diseno_csv)
                 for estudiante in self.estudiantes_diseno_lista:
                     Escritor_Diseno.writerow(estudiante.convertir_lista_diseno())
@@ -125,7 +125,7 @@ class Metodos_Estudiantes:
             self.etiqueta_cantidad_materias = CTK.CTkLabel(self.frame_eleccion_carrera, text="Cantidad de materias")
             self.etiqueta_cantidad_materias.grid(row=6,column=0,pady=5,padx=10)
             self.desplegable_cantidad_materias = CTK.CTkComboBox(self.frame_eleccion_carrera, values=[str(i+1) for i in range(20)], state="readonly")
-            self.desplegable_cantidad_materias.set(0)
+            self.desplegable_cantidad_materias.set("0")
             self.desplegable_cantidad_materias.grid(row=6,column=1,pady=5,padx=10)
         
     # Función para validar datos ingresados y si es el caso el registro
@@ -231,6 +231,11 @@ class Metodos_Estudiantes:
         self.etiqueta_excepciones.grid(row=8,column=0, columnspan=2,pady=5,padx=10)
         
     def busqueda_estudiantes(self,ventana_modificacion_estudiantes):
+        def boton_buscar_estudiante():
+            cedula_a_buscar = self.entrada_id_busqueda.get()
+            carrera_a_buscar = self.desplegable_carrera_busqueda.get()
+            self.buscar_registro_modificar(cedula_a_buscar,carrera_a_buscar,ventana_modificacion_estudiantes)
+            
         self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas de cédulas u objetos
         self.ventana_modificacion_estudiantes = CTK.CTkFrame(ventana_modificacion_estudiantes)
         self.ventana_modificacion_estudiantes.pack()
@@ -247,11 +252,11 @@ class Metodos_Estudiantes:
         self.desplegable_carrera_busqueda = CTK.CTkComboBox(self.frame_validacion_carrera, values=["Ingeniería","Diseño"], state="readonly")
         self.desplegable_carrera_busqueda.set("Ingeniería")
         self.desplegable_carrera_busqueda.grid(row=0, column=3, padx=5, pady=10)
-        self.boton_carrera_busqueda = CTK.CTkButton(self.frame_validacion_carrera, text="Buscar", command=self.buscar_registro_modificar)
+        self.boton_carrera_busqueda = CTK.CTkButton(self.frame_validacion_carrera, text="🔍", font=(None,20), width=28, command=boton_buscar_estudiante)
         self.boton_carrera_busqueda.grid(row=0, column=4, padx=5, pady=10)
         self.etiqueta_excepciones = CTK.CTkLabel(self.frame_validacion_carrera,height=15)
         
-    def buscar_registro_modificar(self):
+    def buscar_registro_modificar(self,cedula_busqueda, carrera_busqueda, ventana_para_modulo_estudiantes, estudiante=False):
         self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas de cédulas u objetos
 
         try:
@@ -259,17 +264,27 @@ class Metodos_Estudiantes:
             self.boton_guardar.destroy()
         except:
             pass
-        self.frame_mostrar_registro_busqueda = CTK.CTkFrame(self.ventana_modificacion_estudiantes,fg_color="transparent")        
 
-        self.entrada_id_busqueda.configure(border_color="gray")
-        self.etiqueta_excepciones.configure(text="", padx=0, pady=0)        
-        try:
-            int(self.entrada_id_busqueda.get())
-        except ValueError:
-            self.entrada_id_busqueda.configure(border_color="#FF5844")
-            self.etiqueta_excepciones.configure(text=f"Valor no valido", padx=10, pady=3)
-            self.etiqueta_excepciones.grid(row=1, column=0, columnspan=5, padx=5)
-            return
+        if estudiante:
+            self.ventana_modificacion_estudiantes = CTK.CTkFrame(ventana_para_modulo_estudiantes)
+            self.ventana_modificacion_estudiantes.pack()
+            self.frame_mostrar_registro_busqueda = CTK.CTkFrame(self.ventana_modificacion_estudiantes,fg_color="transparent")
+                    
+        else:
+            self.frame_mostrar_registro_busqueda = CTK.CTkFrame(self.ventana_modificacion_estudiantes,fg_color="transparent")
+
+            try:
+                self.entrada_id_busqueda.configure(border_color="gray")
+                self.etiqueta_excepciones.configure(text="", padx=0, pady=0)
+            except:
+                pass
+            try:
+                int(self.entrada_id_busqueda.get())
+            except ValueError:
+                self.entrada_id_busqueda.configure(border_color="#FF5844")
+                self.etiqueta_excepciones.configure(text=f"Valor no valido", padx=10, pady=3)
+                self.etiqueta_excepciones.grid(row=1, column=0, columnspan=5, padx=5)
+                return
             
         def actualizar_datos_estudiante(actualizar=True, activar=False):
             if actualizar:
@@ -278,7 +293,10 @@ class Metodos_Estudiantes:
                 persona_actual.apellido = self.entrada_apellido.get()
                 persona_actual.telefono = self.entrada_telefono.get()
                 persona_actual.estado = self.desplegable_estado.get()
-                        
+                
+                if persona_actual.estado == "INACTIVO":
+                    persona_actual.serial = ""
+
                 if self.eleccion_carrera == "Ingeniería":
                     persona_actual.semestre = self.desplegable_semestre.get()
                     persona_actual.promedio = self.entrada_promedio.get()
@@ -307,12 +325,10 @@ class Metodos_Estudiantes:
         def activacion_estudiante():
             actualizar_datos_estudiante(actualizar=False, activar=True)
 
-        cedula_busqueda = self.entrada_id_busqueda.get()
-        carrera_busqueda = self.desplegable_carrera_busqueda.get()
-
         def mostrar_datos_estudiante(persona_actual, carrera):
+            
             self.frame_mostrar_registro_busqueda.pack()
-            self.paneles_segun_carrera(self.frame_mostrar_registro_busqueda, carrera, panel_estado=True)
+            self.paneles_segun_carrera(self.frame_mostrar_registro_busqueda, carrera, not estudiante)
             self.entrada_cedula.insert(0, persona_actual.cedula)
             self.entrada_cedula.configure(state="readonly")
             self.entrada_nombre.insert(0, persona_actual.nombre)
@@ -325,12 +341,12 @@ class Metodos_Estudiantes:
             elif carrera == "Diseño":
                 self.desplegable_modalidad.set(persona_actual.modalidad)
                 self.desplegable_cantidad_materias.set(persona_actual.cantidad_asignaturas)
-
-            self.desplegable_estado.set(persona_actual.estado)
+                
+            if not estudiante:
+                self.desplegable_estado.set(persona_actual.estado)
 
             self.boton_guardar = CTK.CTkButton(self.frame_mostrar_registro_busqueda, text="Guardar cambios", command=validacion_actualizar_datos_estudiante)
             self.boton_guardar.pack(pady=10)
-
 
         def mostrar_inactivo(persona_actual):
             self.frame_mostrar_registro_busqueda.pack()
@@ -394,18 +410,13 @@ class Metodos_Estudiantes:
                     except:
                         etiqueta_error_conversion = CTK.CTkLabel(pantalla_validacion_carrera, text="Error al convertir a listas.", height=15)
                         etiqueta_error_conversion.grid(row=2, column=0, columnspan=3, padx=3)
-                
-                if numero_registro % 2 == 1:
-                    color_fondo = "#4b4b4b" 
-                else:
-                    color_fondo = None
-                        
+                                        
                 if numero_registro == 0:
                     for numero, dato in enumerate(registro_lista):
-                        CTK.CTkLabel(pantalla_mostrar_registros, text=dato, fg_color=color_fondo, height= 33, width=70, wraplength=70).grid(row=numero_registro+1, column=numero, pady=3)
+                        CTK.CTkLabel(pantalla_mostrar_registros, text=dato, fg_color="#2A2A2A", height= 33, width=70, wraplength=70).grid(row=numero_registro+1, column=numero, pady=3)
                 else:
                     for numero, dato in enumerate(registro_lista):
-                        etiqueta_entrada_registro = CTK.CTkEntry(pantalla_mostrar_registros, fg_color=color_fondo, height= 33, width=70, corner_radius=0, border_width=0)
+                        etiqueta_entrada_registro = CTK.CTkEntry(pantalla_mostrar_registros, fg_color="#4b4b4b", height= 33, width=70, corner_radius=0, border_width=0)
                         etiqueta_entrada_registro.insert(0,dato)
                         etiqueta_entrada_registro.configure(state="readonly")
                         etiqueta_entrada_registro.grid(row=numero_registro+1, column=numero)
