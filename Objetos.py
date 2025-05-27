@@ -25,6 +25,13 @@ class ESTUDIANTE_DISENO(ESTUDIANTES):
     def convertir_lista_diseno(self):
         return [self.cedula,self.nombre,self.apellido,self.telefono,self.modalidad,self.cantidad_asignaturas,self.estado,self.serial]
 
+class ADMIN(ESTUDIANTES):
+    def __init__(self, cedula, nombre, apellido, telefono, estado="ACTIVO", serial=""):
+        super().__init__(cedula, nombre, apellido, telefono, estado, serial)
+        
+    def convertir_lista_admin(self):
+        return [self.cedula,self.nombre,self.apellido,self.telefono,self.estado,self.serial]
+
 class DISPOSITIVOS:
     def __init__(self, serial, marca, tamano, precio, estado="ACTIVO"):
         self.serial = serial 
