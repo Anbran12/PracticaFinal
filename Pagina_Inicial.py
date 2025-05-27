@@ -264,5 +264,5 @@ class PANTALLA_PRINCIPAL:
         boton_mostrar_prestamos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Mostrar prestamos", command=mostrar_prestamos)
         boton_mostrar_prestamos.pack(pady=3, padx=10)
         boton_volver_iniciar_sesion = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Cerrar sesión", command=self.boton_volver_login)
-        boton_volver_iniciar_sesion.pack(pady=3, padx=10)
+        boton_volver_iniciar_sesion.pack(pady=3, padx=10) 
 

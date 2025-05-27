@@ -297,4 +297,4 @@ class Metodos_Prestamos:
         desplegable_equipo.set("Computadores")
         desplegable_equipo.grid(row=0, column=1, padx=10)
         boton_buscar_equipo = CTK.CTkButton(pantalla_validacion_carrera, text="🔍", font=(None,20), width=28, command=mostar_prestamos_boton)
-        boton_buscar_equipo.grid(row=0, column=2, padx=10)
+        boton_buscar_equipo.grid(row=0, column=2, padx=10) 
