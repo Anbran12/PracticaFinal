@@ -32,6 +32,28 @@ class Metodos_Prestamos:
                     self.tabletas_prestados_diseno.append(serial)
                     self.estudiantes_diseno_lista.append(Objetos.ESTUDIANTE_DISENO(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado, serial))
 
+            self.computadores_ingenieria = []
+            self.computadores_ingenieria_disponibles = []
+            with open("Computadores_Portatiles.csv", "r", newline="", encoding='utf-8') as archivo:
+                lector = csv.reader(archivo)
+                for e in lector:
+                    serial, marca, tamano, precio, sistema_operativo, procesador, estado = e
+                    self.computadores_ingenieria.append(Objetos.COMPUTADOR_PORTATIL(serial, marca, tamano, precio, sistema_operativo, procesador, estado))
+                for e in self.computadores_ingenieria:
+                    if e.serial not in self.computadores_prestados_ingenieria:
+                        self.computadores_ingenieria_disponibles.append(e.serial)
+
+            self.tabletas_diseno = []
+            self.tabletas_diseno_disponibles = []
+            with open("Tabletas_Graficas.csv", "r", newline="", encoding='utf-8') as archivo:
+                lector = csv.reader(archivo)
+                for e in lector:
+                    serial, marca, tamano, precio, almacenamiento, peso, estado = e
+                    self.tabletas_diseno.append(Objetos.TABLETA_GRAFICA(serial, marca, tamano, precio, almacenamiento, peso, estado))
+                for e in self.tabletas_diseno:
+                    if e.serial not in self.tabletas_prestados_diseno:
+                        self.tabletas_diseno_disponibles.append(e.serial)
+
         if modificar:
             with open("Estudiantes_Ingenieria.csv", "w", newline="", encoding='utf-8') as archivo:
                 escritor = csv.writer(archivo)
@@ -63,12 +85,12 @@ class Metodos_Prestamos:
         # Campo específico según carrera
         if carrera == "Ingeniería":
             CTK.CTkLabel(self.frame_eleccion_carrera, text="Computador").grid(row=5, column=0, padx=10, pady=5)
-            self.desplegable_computador = CTK.CTkComboBox(self.frame_eleccion_carrera, values=["Sin equipos aún"], state="readonly")
+            self.desplegable_computador = CTK.CTkComboBox(self.frame_eleccion_carrera, values=self.computadores_ingenieria_disponibles, state="readonly")
             self.desplegable_computador.set("Seleccione")
             self.desplegable_computador.grid(row=5, column=1, padx=10, pady=5)
         else:
             CTK.CTkLabel(self.frame_eleccion_carrera, text="Tableta").grid(row=5, column=0, padx=10, pady=5)
-            self.desplegable_tableta = CTK.CTkComboBox(self.frame_eleccion_carrera, values=["Sin equipos aún"], state="readonly")
+            self.desplegable_tableta = CTK.CTkComboBox(self.frame_eleccion_carrera, values=self.tabletas_diseno_disponibles, state="readonly")
             self.desplegable_tableta.set("Seleccione")
             self.desplegable_tableta.grid(row=5, column=1, padx=10, pady=5)
 
@@ -111,7 +133,7 @@ class Metodos_Prestamos:
     def guardar_serial(self, cedula, nuevo_serial, devolucion=False):
 
         for persona in self.estudiantes_ingenieria_lista + self.estudiantes_diseno_lista:
-            if persona.cedula == cedula:
+            if persona.cedula == cedula or persona.serial == cedula:
                 if devolucion:
                     persona.serial = ""
                 else:
@@ -166,6 +188,7 @@ class Metodos_Prestamos:
             
     def busqueda_estudiantes_admin(self,ventana_busqueda_estudiantes_admin):
         def buscar_estudiante_admin():
+            self.lector_csv_estudiantes()
             try:
                 for elemento in self.ventana_carga_busqueda_estudiantes_admin.winfo_children():
                     elemento.destroy()
@@ -214,7 +237,7 @@ class Metodos_Prestamos:
 
         for persona in lista_personas:
             if persona.cedula == cedula_buscar or persona.serial == cedula_buscar:
-                if persona.estado != "ACTIVO":
+                if persona.estado == "INACTIVO":
                     etiqueta_estados.configure(text="Usuario inactivo.")
                     return
                 persona_actual = persona
@@ -245,7 +268,7 @@ class Metodos_Prestamos:
             self.precargar_datos_estudiante(persona_actual, self.eleccion_carrera, False)
             CTK.CTkButton(frame, text="Guardar cambios", command=guardar_nuevo_serial).pack(pady=10)
             CTK.CTkButton(frame, text="Realizar devolución", command=devolucion).pack()
-            etiqueta_estados.pack()            
+            etiqueta_estados.pack()
         else:
             CTK.CTkLabel(frame, text="Documento/serial no encontrado.").pack()
 
