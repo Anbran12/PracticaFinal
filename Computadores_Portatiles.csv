@@ -1,0 +1,11 @@
+serial,marca,tamano,precio,sistema operativo,procesador,estado
+CP001,HP,15.6,3200,Windows 11,Intel Core i5,ACTIVO
+CP002,Dell,14.0,2800,Windows 10,Intel Core i7,ACTIVO
+CP003,Lenovo,13.3,2600,Windows 11,AMD Ryzen 5,INACTIVO
+CP004,Acer,15.6,2400,Windows 10,Intel Core i3,ACTIVO
+CP005,Asus,14.0,3000,Windows 11,Intel Core i5,ACTIVO
+CP006,Apple,13.3,4800,macOS M1,Apple M1,INACTIVO
+CP007,MSI,17.3,5200,Windows 11,Intel Core i9,ACTIVO
+CP008,Samsung,13.3,2700,Windows 10,Intel Core i5,INACTIVO
+CP009,Toshiba,15.0,2300,Windows 10,Intel Core i3,ACTIVO
+CP010,Huawei,14.0,2900,Windows 11,AMD Ryzen 7,ACTIVO
