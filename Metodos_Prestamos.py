@@ -1,255 +1,323 @@
-# Importamos las librerías necesarias
-import customtkinter as CTK  # Biblioteca para interfaz gráfica moderna
-import csv  # Para manipulación de archivos CSV
-from datetime import datetime  # Para trabajar con fechas y horas actuales
-from dateutil.parser import parse  # Para analizar y validar formatos de fecha y hora
+import csv
+import customtkinter as CTK
+import Objetos
 
 class Metodos_Prestamos:
-    # Constructor: recibe el frame donde se mostrarán los widgets
-    def __init__(self, frame_principal):
-        self.frame_principal = frame_principal  # Contenedor gráfico principal
-        self.archivo_prestamos = "Prestamos.csv"  # Nombre del archivo donde se guardan los préstamos
-        self.widgets_prestamo = {}  # Diccionario para guardar widgets de entrada y acceder a ellos fácilmente
+    
+    def __init__(self, informacion_estudiante, carrera_estudiante):
+        self.informacion_estudiante = informacion_estudiante
+        self.eleccion_carrera = carrera_estudiante
 
-    # Función para leer todos los préstamos del archivo CSV
-    def leer_prestamos(self):
-        prestamos = []
-        try:
-            # Si el archivo existe, lo abrimos y leemos con DictReader
-            with open(self.archivo_prestamos, 'r', newline='', encoding='utf-8') as archivo_csv:
-                lector_csv = csv.DictReader(archivo_csv)
-                for prestamo in lector_csv:
-                    prestamos.append(prestamo)
-        except FileNotFoundError:
-            # Si no existe el archivo, lo creamos con encabezados
-            with open(self.archivo_prestamos, 'w', newline='', encoding='utf-8') as archivo_csv:
-                escritor_csv = csv.writer(archivo_csv)
-                escritor_csv.writerow([
-                    'id_prestamo', 'cedula_estudiante', 'serial_equipo',
-                    'fecha_prestamo', 'fecha_devolucion_esperada',
-                    'fecha_devolucion_real', 'estado_prestamo'
-                ])
-        return prestamos
+    def lector_csv_estudiantes(self, leer_archivo=True, modificar=False):
+        if leer_archivo:
+            self.cedulas_estudiantes_ingenieria_lista = []
+            self.estudiantes_ingenieria_lista = []
+            self.computadores_prestados_ingenieria = []
+            with open("Estudiantes_Ingenieria.csv", "r", newline="", encoding='utf-8') as archivo:
+                lector = csv.reader(archivo)
+                for e in lector:
+                    cedula, nombre, apellido, telefono, semestre, promedio, estado, serial = e
+                    self.cedulas_estudiantes_ingenieria_lista.append(cedula)
+                    self.computadores_prestados_ingenieria.append(serial)
+                    self.estudiantes_ingenieria_lista.append(Objetos.ESTUDIANTE_INGENIERIA(cedula, nombre, apellido, telefono, semestre, promedio, estado, serial))
 
-    # Función para escribir un nuevo préstamo en el archivo
-    def escribir_prestamo(self, prestamo):
-        with open(self.archivo_prestamos, 'a', newline='', encoding='utf-8') as archivo_csv:
-            escritor_csv = csv.writer(archivo_csv)
-            escritor_csv.writerow([
-                prestamo['id_prestamo'], prestamo['cedula_estudiante'],
-                prestamo['serial_equipo'], prestamo['fecha_prestamo'],
-                prestamo['fecha_devolucion_esperada'], prestamo['fecha_devolucion_real'],
-                prestamo['estado_prestamo']
-            ])
+            self.cedulas_estudiantes_diseno_lista = []
+            self.estudiantes_diseno_lista = []
+            self.tabletas_prestados_diseno = []
+            with open("Estudiantes_Diseno.csv", "r", newline="", encoding='utf-8') as archivo:
+                lector = csv.reader(archivo)
+                for e in lector:
+                    cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado, serial = e
+                    self.cedulas_estudiantes_diseno_lista.append(cedula)
+                    self.tabletas_prestados_diseno.append(serial)
+                    self.estudiantes_diseno_lista.append(Objetos.ESTUDIANTE_DISENO(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado, serial))
 
-    # Interfaz gráfica para registrar un préstamo nuevo
-    def registrar_prestamo(self):
-        for widget in self.frame_principal.winfo_children():
-            widget.destroy()  # Limpiar el frame antes de mostrar nuevos elementos
+            self.computadores_ingenieria = []
+            self.computadores_ingenieria_disponibles = []
+            with open("Computadores_Portatiles.csv", "r", newline="", encoding='utf-8') as archivo:
+                lector = csv.reader(archivo)
+                for e in lector:
+                    serial, marca, tamano, precio, sistema_operativo, procesador, estado = e
+                    self.computadores_ingenieria.append(Objetos.COMPUTADOR_PORTATIL(serial, marca, tamano, precio, sistema_operativo, procesador, estado))
+                for e in self.computadores_ingenieria:
+                    if e.serial not in self.computadores_prestados_ingenieria:
+                        self.computadores_ingenieria_disponibles.append(e.serial)
 
-        CTK.CTkLabel(self.frame_principal, text="Registrar Préstamo", font=('', 20)).pack(pady=10)
+            self.tabletas_diseno = []
+            self.tabletas_diseno_disponibles = []
+            with open("Tabletas_Graficas.csv", "r", newline="", encoding='utf-8') as archivo:
+                lector = csv.reader(archivo)
+                for e in lector:
+                    serial, marca, tamano, precio, almacenamiento, peso, estado = e
+                    self.tabletas_diseno.append(Objetos.TABLETA_GRAFICA(serial, marca, tamano, precio, almacenamiento, peso, estado))
+                for e in self.tabletas_diseno:
+                    if e.serial not in self.tabletas_prestados_diseno:
+                        self.tabletas_diseno_disponibles.append(e.serial)
 
-        # Cédula del estudiante
-        etiqueta_cedula = CTK.CTkLabel(self.frame_principal, text="Cédula del Estudiante:")
-        etiqueta_cedula.pack(pady=5)
-        entrada_cedula = CTK.CTkEntry(self.frame_principal)
-        entrada_cedula.pack(pady=5)
-        self.widgets_prestamo['cedula_estudiante'] = entrada_cedula
+        if modificar:
+            with open("Estudiantes_Ingenieria.csv", "w", newline="", encoding='utf-8') as archivo:
+                escritor = csv.writer(archivo)
+                for e in self.estudiantes_ingenieria_lista:
+                    escritor.writerow(e.convertir_lista_ingenieria())
+            with open("Estudiantes_Diseno.csv", "w", newline="", encoding='utf-8') as archivo:
+                escritor = csv.writer(archivo)
+                for e in self.estudiantes_diseno_lista:
+                    escritor.writerow(e.convertir_lista_diseno())
 
-        # Serial del equipo
-        etiqueta_serial = CTK.CTkLabel(self.frame_principal, text="Serial del Equipo:")
-        etiqueta_serial.pack(pady=5)
-        entrada_serial = CTK.CTkEntry(self.frame_principal)
-        entrada_serial.pack(pady=5)
-        self.widgets_prestamo['serial_equipo'] = entrada_serial
+    def paneles_prestamo(self, frame, carrera):
+        self.frame_eleccion_carrera = CTK.CTkFrame(frame, fg_color="transparent")
+        self.frame_eleccion_carrera.pack()
 
-        # Fecha esperada de devolución
-        etiqueta_fecha_devolucion = CTK.CTkLabel(
-            self.frame_principal,
-            text="Fecha de Devolución Esperada (YYYY-MM-DD HH:MM:SS):"
-        )
-        etiqueta_fecha_devolucion.pack(pady=5)
-        entrada_fecha_devolucion = CTK.CTkEntry(self.frame_principal)
-        entrada_fecha_devolucion.pack(pady=5)
-        self.widgets_prestamo['fecha_devolucion_esperada'] = entrada_fecha_devolucion
-
-        # Botón para guardar préstamo
-        boton_guardar = CTK.CTkButton(self.frame_principal, text="Guardar Préstamo", command=self.guardar_prestamo)
-        boton_guardar.pack(pady=10)
-
-        # Mensajes de éxito o error
-        self.label_mensaje = CTK.CTkLabel(self.frame_principal, text="")
-        self.label_mensaje.pack(pady=5)
-
-    # Función para guardar el préstamo con validaciones
-    def guardar_prestamo(self):
-        cedula_estudiante = self.widgets_prestamo['cedula_estudiante'].get()
-        serial_equipo = self.widgets_prestamo['serial_equipo'].get()
-        fecha_devolucion_esperada = self.widgets_prestamo['fecha_devolucion_esperada'].get()
-
-        try:
-            parse(fecha_devolucion_esperada)  # Valida el formato de fecha
-        except ValueError:
-            self.label_mensaje.configure(text="Error: Formato de fecha inválido (YYYY-MM-DD HH:MM:SS)")
-            return
-
-        # Se generan automáticamente la fecha actual y el ID único
-        id_prestamo = datetime.now().strftime("%Y%m%d%H%M%S")
-        fecha_prestamo = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        # Diccionario con los datos del préstamo
-        nuevo_prestamo = {
-            'id_prestamo': id_prestamo,
-            'cedula_estudiante': cedula_estudiante,
-            'serial_equipo': serial_equipo,
-            'fecha_prestamo': fecha_prestamo,
-            'fecha_devolucion_esperada': fecha_devolucion_esperada,
-            'fecha_devolucion_real': '',
-            'estado_prestamo': 'Activo'
-        }
-
-        self.escribir_prestamo(nuevo_prestamo)
-        self.label_mensaje.configure(text="Préstamo registrado exitosamente.")
-
-    # Interfaz para modificar un préstamo
-    def modificar_prestamo(self):
-        for widget in self.frame_principal.winfo_children():
-            widget.destroy()
-
-        CTK.CTkLabel(self.frame_principal, text="Modificar Préstamo", font=('', 20)).pack(pady=10)
-
-        etiqueta_id_prestamo = CTK.CTkLabel(self.frame_principal, text="ID del Préstamo a Modificar:")
-        etiqueta_id_prestamo.pack(pady=5)
-        entrada_id_prestamo = CTK.CTkEntry(self.frame_principal)
-        entrada_id_prestamo.pack(pady=5)
-
-        boton_buscar = CTK.CTkButton(
-            self.frame_principal,
-            text="Buscar Préstamo",
-            command=lambda: self.buscar_y_mostrar_prestamo(entrada_id_prestamo.get())
-        )
-        boton_buscar.pack(pady=10)
-
-        self.frame_modificacion = CTK.CTkFrame(self.frame_principal)
-        self.frame_modificacion.pack(pady=10, fill="x")
-
-        self.label_mensaje = CTK.CTkLabel(self.frame_principal, text="")
-        self.label_mensaje.pack(pady=5)
-
-    # Busca y muestra la información de un préstamo por su ID
-    def buscar_y_mostrar_prestamo(self, id_prestamo):
-        prestamos = self.leer_prestamos()
-        prestamo_encontrado = next((p for p in prestamos if p['id_prestamo'] == id_prestamo), None)
-
-        if prestamo_encontrado:
-            for widget in self.frame_modificacion.winfo_children():
-                widget.destroy()
-
-            CTK.CTkLabel(self.frame_modificacion, text="Datos del Préstamo:").pack(pady=5)
-            for key, value in prestamo_encontrado.items():
-                CTK.CTkLabel(self.frame_modificacion, text=f"{key.capitalize()}: {value}").pack(pady=2)
-
-            entrada_cedula = CTK.CTkEntry(self.frame_modificacion)
-            entrada_cedula.insert(0, prestamo_encontrado.get('cedula_estudiante', ''))
-            entrada_cedula.pack(pady=2)
-
-            entrada_serial = CTK.CTkEntry(self.frame_modificacion)
-            entrada_serial.insert(0, prestamo_encontrado.get('serial_equipo', ''))
-            entrada_serial.pack(pady=2)
-
-            entrada_fecha_devolucion = CTK.CTkEntry(self.frame_modificacion)
-            entrada_fecha_devolucion.insert(0, prestamo_encontrado.get('fecha_devolucion_esperada', ''))
-            entrada_fecha_devolucion.pack(pady=2)
-
-            CTK.CTkButton(
-                self.frame_modificacion, text="Guardar Cambios",
-                command=lambda: self.guardar_modificacion_prestamo(
-                    id_prestamo, entrada_cedula.get(), entrada_serial.get(), entrada_fecha_devolucion.get()
-                )
-            ).pack(pady=10)
+        # Campos comunes
+        self.etiqueta_cedula = CTK.CTkLabel(self.frame_eleccion_carrera, text="Cédula")
+        self.etiqueta_cedula.grid(row=1,column=0,pady=5,padx=10)
+        self.entrada_cedula = CTK.CTkEntry(self.frame_eleccion_carrera)
+        self.entrada_cedula.grid(row=1,column=1,pady=5,padx=10)
+        self.etiqueta_nombre = CTK.CTkLabel(self.frame_eleccion_carrera, text="Nombre")
+        self.etiqueta_nombre.grid(row=2,column=0,pady=5,padx=10)
+        self.entrada_nombre = CTK.CTkEntry(self.frame_eleccion_carrera)
+        self.entrada_nombre.grid(row=2,column=1,pady=5,padx=10)
+        self.etiqueta_apellido = CTK.CTkLabel(self.frame_eleccion_carrera, text="Apellido")
+        self.etiqueta_apellido.grid(row=3,column=0,pady=5,padx=10)
+        self.entrada_apellido = CTK.CTkEntry(self.frame_eleccion_carrera)
+        self.entrada_apellido.grid(row=3,column=1,pady=5,padx=10)
+        
+        # Campo específico según carrera
+        if carrera == "Ingeniería":
+            CTK.CTkLabel(self.frame_eleccion_carrera, text="Computador").grid(row=5, column=0, padx=10, pady=5)
+            self.desplegable_computador = CTK.CTkComboBox(self.frame_eleccion_carrera, values=self.computadores_ingenieria_disponibles, state="readonly")
+            self.desplegable_computador.set("Seleccione")
+            self.desplegable_computador.grid(row=5, column=1, padx=10, pady=5)
         else:
-            self.label_mensaje.configure(text="Préstamo no encontrado.")
+            CTK.CTkLabel(self.frame_eleccion_carrera, text="Tableta").grid(row=5, column=0, padx=10, pady=5)
+            self.desplegable_tableta = CTK.CTkComboBox(self.frame_eleccion_carrera, values=self.tabletas_diseno_disponibles, state="readonly")
+            self.desplegable_tableta.set("Seleccione")
+            self.desplegable_tableta.grid(row=5, column=1, padx=10, pady=5)
 
-    # Guarda los cambios de un préstamo modificado
-    def guardar_modificacion_prestamo(self, id_prestamo, nueva_cedula, nuevo_serial, nueva_fecha_devolucion):
-        prestamos = self.leer_prestamos()
-        for prestamo in prestamos:
-            if prestamo['id_prestamo'] == id_prestamo:
-                if nueva_cedula:
-                    prestamo['cedula_estudiante'] = nueva_cedula
-                if nuevo_serial:
-                    prestamo['serial_equipo'] = nuevo_serial
-                if nueva_fecha_devolucion:
-                    prestamo['fecha_devolucion_esperada'] = nueva_fecha_devolucion
-                break
-        self.reescribir_prestamos(prestamos)
-        self.label_mensaje.configure(text="Préstamo modificado exitosamente.")
+    def precargar_datos_estudiante(self, persona, carrera, editable=True):
+        self.entrada_cedula.insert(0, persona.cedula)
+        self.entrada_nombre.insert(0, persona.nombre)
+        self.entrada_apellido.insert(0, persona.apellido)
 
-    # Reescribe el archivo con todos los préstamos actualizados
-    def reescribir_prestamos(self, prestamos):
-        with open(self.archivo_prestamos, 'w', newline='', encoding='utf-8') as archivo_csv:
-            escritor_csv = csv.DictWriter(archivo_csv, fieldnames=prestamos[0].keys())
-            escritor_csv.writeheader()
-            escritor_csv.writerows(prestamos)
-
-    # Interfaz para registrar la devolución de un préstamo
-    def devolucion_prestamo(self):
-        for widget in self.frame_principal.winfo_children():
-            widget.destroy()
-
-        CTK.CTkLabel(self.frame_principal, text="Devolución de Préstamo", font=('', 20)).pack(pady=10)
-
-        etiqueta_id_prestamo = CTK.CTkLabel(self.frame_principal, text="ID del Préstamo a Devolver:")
-        etiqueta_id_prestamo.pack(pady=5)
-        entrada_id_prestamo = CTK.CTkEntry(self.frame_principal)
-        entrada_id_prestamo.pack(pady=5)
-
-        CTK.CTkButton(
-            self.frame_principal, text="Devolver Préstamo",
-            command=lambda: self.registrar_devolucion(entrada_id_prestamo.get())
-        ).pack(pady=10)
-
-        self.label_mensaje = CTK.CTkLabel(self.frame_principal, text="")
-        self.label_mensaje.pack(pady=5)
-
-    # Registra la devolución de un equipo y cambia su estado
-    def registrar_devolucion(self, id_prestamo):
-        prestamos = self.leer_prestamos()
-        for prestamo in prestamos:
-            if prestamo['id_prestamo'] == id_prestamo:
-                prestamo['fecha_devolucion_real'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                prestamo['estado_prestamo'] = "Devuelto"
-                break
+        if carrera == "Ingeniería":
+            self.desplegable_computador.set(persona.serial)
         else:
-            self.label_mensaje.configure(text="Préstamo no encontrado.")
+            self.desplegable_tableta.set(persona.serial)
+
+        if not editable:
+            for entry in [self.entrada_cedula, self.entrada_nombre, self.entrada_apellido]:
+                entry.configure(state="readonly")
+
+
+    def validar_datos_registro(self, carrera):
+        errores = []
+        if carrera == "Ingeniería" and self.desplegable_computador.get() == "Seleccione":
+            errores.append("Selecciona un computador.")
+        elif carrera == "Diseño" and self.desplegable_tableta.get() == "Seleccione":
+            errores.append("Selecciona una tableta.")
+        return errores
+
+    def mostrar_errores_registro(self, errores):
+        if errores:
+            ventana = CTK.CTkToplevel()
+            ventana.title("Error de registro")
+            ventana.geometry("270x150+850+300")
+            ventana.resizable(False, False)
+            ventana.grab_set()
+            CTK.CTkLabel(ventana, text="Inconsistencias detectadas:").pack(pady=5)
+            frame = CTK.CTkScrollableFrame(ventana, width=250)
+            frame.pack(padx=10, pady=5)
+            for i, error in enumerate(errores):
+                CTK.CTkLabel(frame, text=f"{i+1}. {error}", anchor="w").pack(anchor="w", padx=5)
+
+    def guardar_serial(self, cedula, nuevo_serial, devolucion=False):
+
+        for persona in self.estudiantes_ingenieria_lista + self.estudiantes_diseno_lista:
+            if persona.cedula == cedula or persona.serial == cedula:
+                if devolucion:
+                    persona.serial = ""
+                else:
+                    persona.serial = nuevo_serial
+                break
+        self.lector_csv_estudiantes(leer_archivo=False, modificar=True)
+
+    def registrar_prestamo_validacion_carrera(self, ventana):
+        self.lector_csv_estudiantes()
+        self.etiqueta_error_prestamo = CTK.CTkLabel(ventana, height=15)
+        estudiante_actual = None
+
+        if self.eleccion_carrera == "Ingeniería":
+            lista = self.estudiantes_ingenieria_lista 
+        else:
+            lista = self.estudiantes_diseno_lista
+            
+        for persona in lista:
+            if persona.cedula == self.informacion_estudiante.cedula:
+                estudiante_actual = persona
+                break
+
+        if not estudiante_actual:
+            self.etiqueta_error_prestamo.configure(text="Estudiante no encontrado.")
+            self.etiqueta_error_prestamo.grid(row=1, column=0)
             return
 
-        self.reescribir_prestamos(prestamos)
-        self.label_mensaje.configure(text="Devolución registrada exitosamente.")
+        if estudiante_actual.serial == "":
+            self.paneles_prestamo(ventana, self.eleccion_carrera)
+            self.precargar_datos_estudiante(estudiante_actual, self.eleccion_carrera)
+            CTK.CTkLabel(self.frame_eleccion_carrera, text="Registrar préstamo").grid(row=0, column=0, columnspan=2)
+            self.boton_validacion = CTK.CTkButton(self.frame_eleccion_carrera, text="Registrar", command=self.realizar_registro, width=170)
+            self.boton_validacion.grid(row=7, column=0, columnspan=2, pady=5)
+            self.etiqueta_excepciones = CTK.CTkLabel(self.frame_eleccion_carrera, height=15)
+        else:
+            self.etiqueta_error_prestamo.configure(text="Ya tiene un equipo prestado. Devuelva primero el actual.")
+            self.etiqueta_error_prestamo.grid(row=1, column=0, pady=5)
 
-    # Muestra todos los préstamos registrados
-    def mostrar_prestamos(self):
-        for widget in self.frame_principal.winfo_children():
-            widget.destroy()
+    def realizar_registro(self):
+        errores = self.validar_datos_registro(self.eleccion_carrera)
+        if errores:
+            self.mostrar_errores_registro(errores)
+        else:
+            if self.eleccion_carrera == "Ingeniería":
+                serial = self.desplegable_computador.get()
+            else:
+                serial = self.desplegable_tableta.get()
 
-        CTK.CTkLabel(self.frame_principal, text="Lista de Préstamos", font=('', 20)).pack(pady=10)
+            self.guardar_serial(self.informacion_estudiante.cedula, serial)
+            self.etiqueta_excepciones.configure(text="Registro completado exitosamente.")
+            self.etiqueta_excepciones.grid(row=8, column=0, columnspan=2, pady=5)
+            
+    def busqueda_estudiantes_admin(self,ventana_busqueda_estudiantes_admin):
+        def buscar_estudiante_admin():
+            self.lector_csv_estudiantes()
+            try:
+                for elemento in self.ventana_carga_busqueda_estudiantes_admin.winfo_children():
+                    elemento.destroy()
+            except:
+                pass
+            cedula_buscar_admin = self.entrada_id_busqueda.get()
+            self.buscar_registro_modificar(self.ventana_carga_busqueda_estudiantes_admin, cedula_buscar_admin)
+        
+        self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas de cédulas u objetos
+        self.frame_validacion_carrera = CTK.CTkFrame(ventana_busqueda_estudiantes_admin,fg_color="transparent",height=48)
+        self.frame_validacion_carrera.pack()
+        self.ventana_carga_busqueda_estudiantes_admin = CTK.CTkFrame(ventana_busqueda_estudiantes_admin)
+        self.ventana_carga_busqueda_estudiantes_admin.pack()
 
-        prestamos = self.leer_prestamos()
-        if not prestamos:
-            CTK.CTkLabel(self.frame_principal, text="No hay préstamos registrados.").pack(pady=10)
-            return
+        self.etiqueta_id_busqueda = CTK.CTkLabel(self.frame_validacion_carrera, text="Id/Serial")
+        self.etiqueta_id_busqueda.grid(row=0, column=0, padx=5, pady=10)
 
-        for prestamo in prestamos:
-            info = (f"ID: {prestamo['id_prestamo']} | "
-                    f"Cédula: {prestamo['cedula_estudiante']} | "
-                    f"Equipo: {prestamo['serial_equipo']} | "
-                    f"Fecha Préstamo: {prestamo['fecha_prestamo']} | "
-                    f"Fecha Devolución Esperada: {prestamo['fecha_devolucion_esperada']} | "
-                    f"Devuelto: {prestamo['fecha_devolucion_real']} | "
-                    f"Estado: {prestamo['estado_prestamo']}")
-            CTK.CTkLabel(self.frame_principal, text=info, anchor='w', justify='left', wraplength=800).pack(pady=2)
+        self.entrada_id_busqueda = CTK.CTkEntry(self.frame_validacion_carrera)
+        self.entrada_id_busqueda.grid(row=0, column=1, padx=5, pady=10)
 
-    # Método adicional que permite iniciar el registro usando un frame externo
-    def registrar_prestamo_validacion_carrera(self, frame, informacion_estudiante, carrera_estudiante):
-        self.frame_principal = frame
-        self.registrar_prestamo()
+        self.boton_carrera_busqueda = CTK.CTkButton(self.frame_validacion_carrera, text="🔍", font=(None,20), width=28, command=buscar_estudiante_admin)
+        self.boton_carrera_busqueda.grid(row=0, column=4, padx=5, pady=10)
+
+        self.etiqueta_excepciones = CTK.CTkLabel(self.frame_validacion_carrera,height=15)
+
+    def buscar_registro_modificar(self, ventana, cedula_buscar):
+        self.lector_csv_estudiantes()
+
+        frame = CTK.CTkFrame(ventana,fg_color="transparent")
+        frame.pack()
+        etiqueta_estados = CTK.CTkLabel(frame,text="")
+#        self.paneles_prestamo(frame, self.eleccion_carrera)
+        persona_actual = None
+
+        lista_personas_ingenieria, lista_cedulas_ingenieria, seriales_ingenieria = self.estudiantes_ingenieria_lista, self.cedulas_estudiantes_ingenieria_lista, self.computadores_prestados_ingenieria
+        lista_personas_diseno, lista_cedulas_diseno, seriales_diseno = self.estudiantes_diseno_lista, self.cedulas_estudiantes_diseno_lista, self.tabletas_prestados_diseno
+
+        lista_personas = []
+
+        if cedula_buscar in lista_cedulas_ingenieria + seriales_ingenieria:
+            self.eleccion_carrera = "Ingeniería"
+            lista_personas = lista_personas_ingenieria
+        elif cedula_buscar in lista_cedulas_diseno + seriales_diseno:
+            self.eleccion_carrera = "Diseño"
+            lista_personas = lista_personas_diseno
+
+        for persona in lista_personas:
+            if persona.cedula == cedula_buscar or persona.serial == cedula_buscar:
+                if persona.estado == "INACTIVO":
+                    etiqueta_estados.configure(text="Usuario inactivo.")
+                    return
+                persona_actual = persona
+                break
+            
+        def guardar_nuevo_serial():
+            if self.eleccion_carrera == "Ingeniería":
+                serial = self.desplegable_computador.get()
+            else:
+                serial = self.desplegable_tableta.get()
+
+            self.guardar_serial(cedula_buscar,serial)
+            etiqueta_estados.configure(text="Modificación completada exitosamente.")
+            
+        def devolucion():
+            if self.eleccion_carrera == "Ingeniería":
+                serial = self.desplegable_computador.get()
+                self.desplegable_computador.set("")
+            else:
+                serial = self.desplegable_tableta.get()
+                self.desplegable_tableta.set("")
+
+            self.guardar_serial(cedula_buscar,serial, True)
+            etiqueta_estados.configure(text="Devolución completada exitosamente.")
+
+        if persona_actual:
+            self.paneles_prestamo(frame, self.eleccion_carrera)
+            self.precargar_datos_estudiante(persona_actual, self.eleccion_carrera, False)
+            CTK.CTkButton(frame, text="Guardar cambios", command=guardar_nuevo_serial).pack(pady=10)
+            CTK.CTkButton(frame, text="Realizar devolución", command=devolucion).pack()
+            etiqueta_estados.pack()
+        else:
+            CTK.CTkLabel(frame, text="Documento/serial no encontrado.").pack()
+
+    def mostrar_prestamos(self, ventana_mostrar_prestamos):
+        self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas de cédulas u objetos
+        pantalla_validacion_carrera = CTK.CTkFrame(ventana_mostrar_prestamos)
+        pantalla_validacion_carrera.pack(pady=10)
+        pantalla_mostrar_registros = CTK.CTkFrame(ventana_mostrar_prestamos)
+        
+        def mostrar_prestamos_segun_equipo(equipo):
+            pantalla_validacion_carrera.destroy()
+            pantalla_mostrar_registros.pack(pady=10)
+            
+            if equipo == "Computadores":
+                lista = self.estudiantes_ingenieria_lista
+            if equipo == "Tabletas":
+                lista = self.estudiantes_diseno_lista
+            
+            for numero_registro, registro in enumerate(lista):
+                
+                if registro.estado in ["ACTIVO", "Estado"] and not registro.serial == "":
+                    try:
+                        registro_lista = registro.convertir_lista_ingenieria()
+                    except:
+                        try:
+                            registro_lista = registro.convertir_lista_diseno()
+                        except:
+                            etiqueta_error_conversion = CTK.CTkLabel(pantalla_validacion_carrera, text="Error al convertir a listas.", height=15)
+                            etiqueta_error_conversion.grid(row=2, column=0, columnspan=3, padx=3)
+                                                
+                    if numero_registro == 0:
+                        for numero, dato in enumerate(registro_lista):
+                            if numero in [0,1,2,7]:
+                                CTK.CTkLabel(pantalla_mostrar_registros, text=dato, fg_color="#2A2A2A", height= 33, width=120, wraplength=115).grid(row=numero_registro+1, column=numero, pady=3)
+                    else:
+                        for numero, dato in enumerate(registro_lista):
+                            if numero in [0,1,2,7]:
+                                etiqueta_entrada_registro = CTK.CTkEntry(pantalla_mostrar_registros, fg_color="#4b4b4b", justify="center", height= 33, width=120, corner_radius=0, border_width=0)
+                                etiqueta_entrada_registro.insert(0,dato)
+                                etiqueta_entrada_registro.configure(state="readonly")
+                                etiqueta_entrada_registro.grid(row=numero_registro+1, column=numero)
+        
+        def mostar_prestamos_boton():
+            mostrar_prestamos_segun_equipo(desplegable_equipo.get())
+            
+        etiqueta_equipo = CTK.CTkLabel(pantalla_validacion_carrera, text="Seleccionar equipo")
+        etiqueta_equipo.grid(row=0, column=0, padx=10)
+        desplegable_equipo = CTK.CTkComboBox(pantalla_validacion_carrera, values=["Computadores","Tabletas"], state="readonly")
+        desplegable_equipo.set("Computadores")
+        desplegable_equipo.grid(row=0, column=1, padx=10)
+        boton_buscar_equipo = CTK.CTkButton(pantalla_validacion_carrera, text="🔍", font=(None,20), width=28, command=mostar_prestamos_boton)
+        boton_buscar_equipo.grid(row=0, column=2, padx=10) 
