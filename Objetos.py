@@ -1,36 +1,37 @@
 class ESTUDIANTES:
-    def __init__(self, cedula, nombre, apellido, telefono, estado="ACTIVO", serial=""):
-        self.cedula = cedula 
+    def __init__(self, identificacion, nombre, apellido, telefono, estado="ACTIVO", serial="", rol=""):
+        self.identificacion = identificacion 
         self.nombre = nombre 
         self.apellido = apellido 
         self.telefono = telefono
         self.estado = estado
         self.serial = serial 
+        self.rol = rol
 
 class ESTUDIANTE_INGENIERIA(ESTUDIANTES):
-    def __init__(self, cedula, nombre, apellido, telefono, semestre, promedio, estado="ACTIVO", serial=""):
-        super().__init__(cedula, nombre, apellido, telefono, estado, serial)
+    def __init__(self, identificacion, nombre, apellido, telefono, semestre, promedio, estado="ACTIVO", serial="", rol="Estudiante"):
+        super().__init__(identificacion, nombre, apellido, telefono, estado, serial, rol)
         self.semestre = semestre 
         self.promedio = promedio 
 
     def convertir_lista_ingenieria(self):
-        return [self.cedula,self.nombre,self.apellido,self.telefono,self.semestre,self.promedio,self.estado,self.serial]
+        return [self.identificacion,self.nombre,self.apellido,self.telefono,self.semestre,self.promedio,self.estado,self.serial,self.rol]
         
 class ESTUDIANTE_DISENO(ESTUDIANTES):
-    def __init__(self, cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado="ACTIVO", serial=""):
-        super().__init__(cedula, nombre, apellido, telefono, estado, serial)
+    def __init__(self, identificacion, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado="ACTIVO", serial="", rol="Estudiante"):
+        super().__init__(identificacion, nombre, apellido, telefono, estado, serial, rol)
         self.modalidad = modalidad 
         self.cantidad_asignaturas = cantidad_asignaturas 
 
     def convertir_lista_diseno(self):
-        return [self.cedula,self.nombre,self.apellido,self.telefono,self.modalidad,self.cantidad_asignaturas,self.estado,self.serial]
+        return [self.identificacion,self.nombre,self.apellido,self.telefono,self.modalidad,self.cantidad_asignaturas,self.estado,self.serial,self.rol]
 
 class ADMIN(ESTUDIANTES):
-    def __init__(self, cedula, nombre, apellido, telefono, estado="ACTIVO", serial=""):
-        super().__init__(cedula, nombre, apellido, telefono, estado, serial)
+    def __init__(self, identificacion, nombre, apellido, estado="ACTIVO", rol="Administrador"):
+        super().__init__(identificacion, nombre, apellido, estado, rol)
         
     def convertir_lista_admin(self):
-        return [self.cedula,self.nombre,self.apellido,self.telefono,self.estado,self.serial]
+        return [self.identificacion,self.nombre,self.apellido,self.estado,self.rol]
 
 class DISPOSITIVOS:
     def __init__(self, serial, marca, tamano, precio, estado="ACTIVO"):

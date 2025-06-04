@@ -8,17 +8,14 @@ Se muestra menú según carrera.
             - Registrar préstamo de equipo.
             - Modificar préstamo de equipo. (Por serial o cedula).
             - Devolución de equipo (se elimina el registro). (Por serial o cedula).
-            - Buscar equipo (Por serial o cedula).
             - Volver al menú principal.
         - Diseño
             - Registrar préstamo de equipo.
             - Modificar préstamo de equipo. (Por serial o cedula).
             - Devolución de equipo (se elimina el registro). (Por serial o cedula).
-            - Buscar equipo (Por serial o cedula)
             - Volver al menú principal.
     - Administrador (Puede hacer modificaciones en en cualquier cédula registrada)
         - Registrar préstamo de equipo.
         - Modificar préstamo de equipo. (Por serial o cedula).
-        - Devolución de equipo (se elimina el registro). (Por serial o cedula).
-        - Buscar equipo (Por serial o cedula).
+        - Devolución de equipo (se elimina el serial). (Por serial o cedula).
         - Volver al menú principal.

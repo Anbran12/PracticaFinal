@@ -1,433 +1,318 @@
 import csv
 import customtkinter as CTK
-import Objetos
-import Pagina_Inicial
+from Objetos import ESTUDIANTE_INGENIERIA, ESTUDIANTE_DISENO, ADMIN
+from Generico import Utilidades
    
 class Metodos_Estudiantes:
-    # Lee ambos archivos .csv donde se almancenan los estudiantes.
-    def lector_csv_estudiantes(self, leer_archivo=True, modificar=False):
-        if leer_archivo:
-            self.cedulas_estudiantes_ingenieria_lista = []
-            self.estudiantes_ingenieria_lista = []
-            with open("Estudiantes_Ingenieria.csv", "r", newline="", encoding='utf-8') as Estudiantes_ingenieria_csv:
-                Lector_Ingenieria = csv.reader(Estudiantes_ingenieria_csv)
-                # Crea un lista con los valores extraidos, (lista de cédulas de ingenieria)
-                for estudiante in Lector_Ingenieria:
-                    cedula, nombre, apellido, telefono, semestre, promedio, estado, serial = estudiante
-                    self.cedulas_estudiantes_ingenieria_lista.append(cedula)
-                # Extrae toda la información del archivo, convierte los valores en objetos y crea un lista (lista de objetos de ingenieria)
-                    self.estudiantes_ingenieria_lista.append(Objetos.ESTUDIANTE_INGENIERIA(cedula, nombre, apellido, telefono, semestre, promedio, estado, serial))
+    def __init__(self, frame, datos_login=None):
+        self.frame = frame
+        self.datos_login = datos_login
+        self.widgets = {}
+        self.label_mensaje = None
+        self.Ut = Utilidades()
+        
+        # Configuración de archivos
+        self.configuracion_usuarios = self.Ut.configuracion_usuarios()
+        
+        # Configuración de campos
+        self.config_campos = self.Ut.configuracion_campos_usuarios()
 
-            self.cedulas_estudiantes_diseno_lista = []
-            self.estudiantes_diseno_lista = []
-            with open("Estudiantes_Diseno.csv", "r", newline="", encoding='utf-8') as Estudiantes_diseno_csv:
-                Lector_Diseno = csv.reader(Estudiantes_diseno_csv)
-                # Crea un lista con los valores extraidos, (lista de cédulas de diseño)
-                for estudiante in Lector_Diseno:
-                    cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado, serial = estudiante
-                    self.cedulas_estudiantes_diseno_lista.append(cedula)
-                # Extrae toda la información del archivo, convierte los valores en objetos y crea un lista (lista de objetos de diseño)
-                    self.estudiantes_diseno_lista.append(Objetos.ESTUDIANTE_DISENO(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado, serial))
+    def registrar_estudiante(self):
+        self.Ut.limpiar_frame(self.frame)
+        
+        CTK.CTkLabel(self.frame, text="Registro de Estudiantes", font=("", 18, "bold")).pack(pady=5)
+        
+        pestanas = CTK.CTkTabview(self.frame, border_width=1, border_color="gray", height=300)
+        pestanas.pack()
+        
+        pestanas.add("Usuarios")
+        pestana_usuarios = pestanas.tab("Usuarios")
+            
+        # Selector de tipo
+        tipo_usuarios = []
+        for i in self.configuracion_usuarios.keys():
+            if i != "Administrador":
+                tipo_usuarios.append(i)
+
+        if self.datos_login:
+            if self.datos_login["rol"] == "Administrador":
+                tipo_usuarios.append("Administrador")
+
+        combo_tipo = CTK.CTkOptionMenu(pestana_usuarios, values=list(tipo_usuarios), width= 200,command=self.actualizar_campos, state="readonly")
+        combo_tipo.set("Estudiante Ingeniería")
+        combo_tipo.pack(pady=5)
+        self.widgets["tipo"] = combo_tipo
+        
+        # Campos comunes
+        self.widgets["identificacion"] = self.Ut.crear_campo(pestana_usuarios,"identificacion",self.config_campos)
+        self.widgets["nombre"] = self.Ut.crear_campo(pestana_usuarios,"nombre",self.config_campos)
+        self.widgets["apellido"] = self.Ut.crear_campo(pestana_usuarios,"apellido",self.config_campos)
+        self.widgets["telefono"] = self.Ut.crear_campo(pestana_usuarios,"telefono",self.config_campos)
+        
+        # Campos específicos
+        self.widgets["semestre"] = self.Ut.crear_campo(pestana_usuarios,"semestre",self.config_campos)
+        self.widgets["promedio"] = self.Ut.crear_campo(pestana_usuarios,"promedio",self.config_campos)
+        self.widgets["modalidad"] = self.Ut.crear_campo(pestana_usuarios,"modalidad",self.config_campos)
+        self.widgets["cantidad_asignaturas"] = self.Ut.crear_campo(pestana_usuarios,"cantidad_asignaturas",self.config_campos)
                 
-        if modificar:
-            with open("Estudiantes_Ingenieria.csv", "w", newline="", encoding='utf-8') as Estudiantes_ingenieria_csv:
-                Escritor_Ingenieria = csv.writer(Estudiantes_ingenieria_csv)
-                for estudiante in self.estudiantes_ingenieria_lista:
-                    Escritor_Ingenieria.writerow(estudiante.convertir_lista_ingenieria())
-
-            with open("Estudiantes_Diseno.csv", "w", newline="", encoding='utf-8') as Estudiantes_diseno_csv:
-                Escritor_Diseno = csv.writer(Estudiantes_diseno_csv)
-                for estudiante in self.estudiantes_diseno_lista:
-                    Escritor_Diseno.writerow(estudiante.convertir_lista_diseno())
-
-    def registrar_estudiantes_validacion_carrera(self,ventana_registro_estudiantes):
-
-        self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas de cédulas u objetos
-
-        def usar_paneles_para_registro():
-            self.paneles_segun_carrera(self.ventana_registro_estudiantes,self.desplegable_carrera.get())
-            self.frame_validacion_carrera.destroy()
-            # Boton validación de datos ingresados y posterior registro si es el caso.
-            self.boton_validacion = CTK.CTkButton(self.frame_eleccion_carrera, text="Registrar", command=self.realizar_registro, width=170)
-            self.boton_validacion.grid(row=7,column=0, columnspan=2,pady=5,padx=10)
-            self.etiqueta_excepciones = CTK.CTkLabel(self.frame_eleccion_carrera,height=15)
-
-        # Consulta de tipo de carrera para posteriormente mostrar las opciones según corresponda.
-        self.ventana_registro_estudiantes = CTK.CTkFrame(ventana_registro_estudiantes)
-        self.ventana_registro_estudiantes.pack()
-        self.frame_validacion_carrera = CTK.CTkFrame(self.ventana_registro_estudiantes,fg_color="transparent")
-        self.frame_validacion_carrera.pack()
-        self.etiqueta_carrera = CTK.CTkLabel(self.frame_validacion_carrera, text="¿Qué carrera está estudiando?")
-        self.etiqueta_carrera.grid(row=0, column=0, columnspan=2,padx=20,pady=10)
-        self.desplegable_carrera = CTK.CTkComboBox(self.frame_validacion_carrera, values=["Ingeniería","Diseño"], state="readonly",width=200, height=33)
-        self.desplegable_carrera.set("Ingeniería")
-        self.desplegable_carrera.grid(row=1, column=0, columnspan=2, padx=5)
-        self.boton_carrera = CTK.CTkButton(self.frame_validacion_carrera, text="Continuar", command=usar_paneles_para_registro, width=170)
-        self.boton_carrera.grid(row=2, column=0, columnspan=2, pady=10)            
-
-    def paneles_segun_carrera(self, frame_para_paneles, carrera_elegida, panel_estado=False):
-                
-        self.frame_eleccion_carrera = CTK.CTkFrame(frame_para_paneles,fg_color="transparent")
-        self.frame_eleccion_carrera.pack()
-        self.eleccion_carrera = carrera_elegida
-
-        # Se muestra las entradas comunes para todos los estudiantes.
-        self.etiqueta_cedula = CTK.CTkLabel(self.frame_eleccion_carrera, text="Cédula")
-        self.etiqueta_cedula.grid(row=1,column=0,pady=5,padx=10)
-        self.entrada_cedula = CTK.CTkEntry(self.frame_eleccion_carrera)
-        self.entrada_cedula.grid(row=1,column=1,pady=5,padx=10)
-        self.etiqueta_nombre = CTK.CTkLabel(self.frame_eleccion_carrera, text="Nombre")
-        self.etiqueta_nombre.grid(row=2,column=0,pady=5,padx=10)
-        self.entrada_nombre = CTK.CTkEntry(self.frame_eleccion_carrera)
-        self.entrada_nombre.grid(row=2,column=1,pady=5,padx=10)
-        self.etiqueta_apellido = CTK.CTkLabel(self.frame_eleccion_carrera, text="Apellido")
-        self.etiqueta_apellido.grid(row=3,column=0,pady=5,padx=10)
-        self.entrada_apellido = CTK.CTkEntry(self.frame_eleccion_carrera)
-        self.entrada_apellido.grid(row=3,column=1,pady=5,padx=10)
-        self.etiqueta_telefono = CTK.CTkLabel(self.frame_eleccion_carrera, text="Teléfono")
-        self.etiqueta_telefono.grid(row=4,column=0,pady=5,padx=10)
-        self.entrada_telefono = CTK.CTkEntry(self.frame_eleccion_carrera)
-        self.entrada_telefono.grid(row=4,column=1,pady=5,padx=10)
+        self.actualizar_campos()
         
-        if panel_estado:
-            self.etiqueta_estado = CTK.CTkLabel(self.frame_eleccion_carrera, text="Estado")
-            self.etiqueta_estado.grid(row=7,column=0,pady=5,padx=10)
-            self.desplegable_estado = CTK.CTkComboBox(self.frame_eleccion_carrera, values=["ACTIVO","INACTIVO"], state="readonly")
-            self.desplegable_estado.set("ACTIVO")
-            self.desplegable_estado.grid(row=7,column=1,pady=5,padx=10)            
-
-        # Se muestra las entradas específicas para todos los estudiantes según su carrera.
-        if self.eleccion_carrera == "Ingeniería":
-            
-            self.etiqueta_carrera = CTK.CTkLabel(self.frame_eleccion_carrera, text=f"Registro estudiante: {self.eleccion_carrera}")
-            self.etiqueta_carrera.grid(row=0, column=0,pady=5,padx=10, columnspan=2)
-            
-            self.etiqueta_semestre = CTK.CTkLabel(self.frame_eleccion_carrera, text="Semestre")
-            self.etiqueta_semestre.grid(row=5,column=0,pady=5,padx=10)
-            self.desplegable_semestre = CTK.CTkComboBox(self.frame_eleccion_carrera, values=[str(i+1) for i in range(12)], state="readonly")
-            self.desplegable_semestre.set("1")
-            self.desplegable_semestre.grid(row=5,column=1,pady=5,padx=10)
-            self.etiqueta_promedio = CTK.CTkLabel(self.frame_eleccion_carrera, text="Promedio")
-            self.etiqueta_promedio.grid(row=6,column=0,pady=5,padx=10)
-            self.entrada_promedio = CTK.CTkEntry(self.frame_eleccion_carrera)
-            self.entrada_promedio.grid(row=6,column=1,pady=5,padx=10)
-
-        elif self.eleccion_carrera == "Diseño":
-
-            self.etiqueta_carrera = CTK.CTkLabel(self.frame_eleccion_carrera, text=f"Registro estudiante: {self.eleccion_carrera}")
-            self.etiqueta_carrera.grid(row=0, column=0,pady=5,padx=10, columnspan=2)
-            
-            self.etiqueta_modalidad = CTK.CTkLabel(self.frame_eleccion_carrera, text="Modalidad")
-            self.etiqueta_modalidad.grid(row=5,column=0,pady=5,padx=10)
-            self.desplegable_modalidad = CTK.CTkComboBox(self.frame_eleccion_carrera, values=["Virtual","Presencial","Mixto"], state="readonly")
-            self.desplegable_modalidad.set("Seleccione")
-            self.desplegable_modalidad.grid(row=5,column=1,pady=5,padx=10)
-            self.etiqueta_cantidad_materias = CTK.CTkLabel(self.frame_eleccion_carrera, text="Cantidad de materias")
-            self.etiqueta_cantidad_materias.grid(row=6,column=0,pady=5,padx=10)
-            self.desplegable_cantidad_materias = CTK.CTkComboBox(self.frame_eleccion_carrera, values=[str(i+1) for i in range(20)], state="readonly")
-            self.desplegable_cantidad_materias.set("0")
-            self.desplegable_cantidad_materias.grid(row=6,column=1,pady=5,padx=10)
+        CTK.CTkButton(self.frame, text="Guardar usuario", command=self.guardar_usuario,font=("", 12, "bold"), width=170).pack(pady=5)
+    
+    def actualizar_campos(self, seleccion=None):
+        """Habilita/deshabilita campos según el tipo"""
+        tipo_seleccionado = self.widgets["tipo"].get()
         
-    # Función para validar datos ingresados y si es el caso el registro
-    def realizar_registro(self):
-        errores = self.validar_datos_registro()
+        # Campos específicos por tipo
+        if tipo_seleccionado == "Estudiante Ingeniería":
+            self.widgets["telefono"].configure(state="normal")
+            self.widgets["semestre"].configure(state="readonly")
+            self.widgets["promedio"].configure(state="normal")
+            self.widgets["modalidad"].configure(state="disabled")
+            self.widgets["cantidad_asignaturas"].configure(state="disabled")
 
-        if errores:
-            self.mostrar_errores_registro(errores)
-        else:
-            self.guardar_registro()
+        elif tipo_seleccionado == "Estudiante Diseño":
+            self.widgets["telefono"].configure(state="normal")
+            self.widgets["semestre"].configure(state="disabled")
+            self.widgets["promedio"].configure(state="disabled")
+            self.widgets["modalidad"].configure(state="readonly")
+            self.widgets["cantidad_asignaturas"].configure(state="readonly")
 
-    # Validar datos ingresados en los entry y combobox
-    def validar_datos_registro(self):
-        lista_errores_registro = []
-        
-        # Validación de datos comunes.
-        if not self.entrada_cedula.get():
-            lista_errores_registro.append("Ingresar cédula.")
-        if not self.entrada_nombre.get():
-            lista_errores_registro.append("Ingresar nombre.")
-        if not self.entrada_apellido.get():
-            lista_errores_registro.append("Ingresar apellido.")
-        if not self.entrada_telefono.get():
-            lista_errores_registro.append("Ingresar teléfono.")
-        
-        # Validación de datos según carrera.
-        if self.eleccion_carrera == "Ingeniería":
-            
-            if not self.entrada_promedio.get():
-                lista_errores_registro.append("Ingresar promedio.")
-            elif self.entrada_promedio.get():
-                try:
-                    float(self.entrada_promedio.get())
-                except ValueError:
-                    lista_errores_registro.append("Promedio: Valor ingresado no válido.")
+        elif tipo_seleccionado == "Administrador":
+            self.widgets["telefono"].configure(state="disabled")
+            self.widgets["semestre"].configure(state="disabled")
+            self.widgets["promedio"].configure(state="disabled")
+            self.widgets["modalidad"].configure(state="disabled")
+            self.widgets["cantidad_asignaturas"].configure(state="disabled")
 
-        elif self.eleccion_carrera == "Diseño":
-            
-            if self.desplegable_modalidad.get() == "Seleccione":
-                lista_errores_registro.append("Seleccione una modalidad de estudio.")
-            if self.desplegable_cantidad_materias.get() == "0":
-                lista_errores_registro.append("Seleccione la cantidad de materias.")
-
-        return lista_errores_registro
-
-    # Si hay errores, se mustra ventana (Toplevel) con mensajes
-    def mostrar_errores_registro(self, lista_errores):
-        lista_errores_registro = lista_errores
-
-        if len(lista_errores_registro) > 0:
-            self.ventana_errores_registro = CTK.CTkToplevel()
-            self.ventana_errores_registro.focus()
-            self.ventana_errores_registro.grab_set()
-            self.ventana_errores_registro.geometry("270x150+850+300")
-            self.ventana_errores_registro.resizable(False,False)
-            self.frame_errores_registro = CTK.CTkScrollableFrame(self.ventana_errores_registro,width=250)
-            self.mensaje_error = CTK.CTkLabel(self.ventana_errores_registro, text="", wraplength=245)
-            self.mensaje_error.pack(padx=10)
-
-            self.ventana_errores_registro.title("Error de registro")
-            self.mensaje_error.configure(text="Inconsistencias detectadas:")
-            self.frame_errores_registro.pack(pady=5,padx=10)
-            for numero, elemento in enumerate(lista_errores_registro):
-                CTK.CTkLabel(self.frame_errores_registro, text=f"{numero+1}. {elemento}", justify="left", anchor="w",wraplength=225).pack(padx=5,anchor="w")
-
-    # Guardar datos en archivos .csv
-    def guardar_registro(self):
-        self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas de cédulas u objetos
-
-        cedula = self.entrada_cedula.get()
-        nombre = self.entrada_nombre.get()
-        apellido = self.entrada_apellido.get()
-        telefono = self.entrada_telefono.get()
-                
-        if self.eleccion_carrera == "Ingeniería":                            
-            semestre = self.desplegable_semestre.get()
-            promedio = self.entrada_promedio.get()
-            if cedula in self.cedulas_estudiantes_ingenieria_lista:
-                self.etiqueta_excepciones.configure(text=f"El documento {cedula} ya existe en el sistema.", padx=10, pady=15)
-                self.etiqueta_excepciones.grid(row=8,column=0, columnspan=2,pady=5,padx=10)
-                self.entrada_cedula.configure(border_color="#FF5844")
-                return
-                
-            registro = Objetos.ESTUDIANTE_INGENIERIA(cedula,nombre,apellido,telefono,semestre,promedio)
-            self.estudiantes_ingenieria_lista.append(registro)
-            self.lector_csv_estudiantes(leer_archivo=False,modificar=True)
-                    
-        elif self.eleccion_carrera == "Diseño":
-            modalidad = self.desplegable_modalidad.get()
-            cantidad_materias = self.desplegable_cantidad_materias.get()
-
-            if cedula in self.cedulas_estudiantes_diseno_lista:
-                self.etiqueta_excepciones.configure(text=f"El documento {cedula} ya existe en el sistema.", padx=10, pady=15)
-                self.etiqueta_excepciones.grid(row=8,column=0, columnspan=2,pady=5,padx=10)
-                self.entrada_cedula.configure(border_color="#FF5844")
-                return
-
-            registro = Objetos.ESTUDIANTE_DISENO(cedula,nombre,apellido,telefono,modalidad,cantidad_materias)
-            self.estudiantes_diseno_lista.append(registro)
-            self.lector_csv_estudiantes(leer_archivo=False,modificar=True)
-
-        self.etiqueta_excepciones.configure(text="El registro se ha completado exitosamente.", padx=10, pady=15)
-        self.etiqueta_excepciones.grid(row=8,column=0, columnspan=2,pady=5,padx=10)
-        
-    def busqueda_estudiantes(self,ventana_modificacion_estudiantes):
-        def boton_buscar_estudiante():
-            cedula_a_buscar = self.entrada_id_busqueda.get()
-            carrera_a_buscar = self.desplegable_carrera_busqueda.get()
-            self.buscar_registro_modificar(cedula_a_buscar,carrera_a_buscar,ventana_modificacion_estudiantes)
-            
-        self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas de cédulas u objetos
-        self.ventana_modificacion_estudiantes = CTK.CTkFrame(ventana_modificacion_estudiantes)
-        self.ventana_modificacion_estudiantes.pack()
-        self.frame_validacion_carrera = CTK.CTkFrame(self.ventana_modificacion_estudiantes,fg_color="transparent")
-        self.frame_validacion_carrera.pack()
-
-        self.etiqueta_id_busqueda = CTK.CTkLabel(self.frame_validacion_carrera, text="Id")
-        self.etiqueta_id_busqueda.grid(row=0, column=0, padx=5, pady=10)
-        self.entrada_id_busqueda = CTK.CTkEntry(self.frame_validacion_carrera)
-        self.entrada_id_busqueda.grid(row=0, column=1, padx=5, pady=10)
-
-        self.etiqueta_carrera_busqueda = CTK.CTkLabel(self.frame_validacion_carrera, text="Carrera")
-        self.etiqueta_carrera_busqueda.grid(row=0, column=2, padx=5, pady=10)
-        self.desplegable_carrera_busqueda = CTK.CTkComboBox(self.frame_validacion_carrera, values=["Ingeniería","Diseño"], state="readonly")
-        self.desplegable_carrera_busqueda.set("Ingeniería")
-        self.desplegable_carrera_busqueda.grid(row=0, column=3, padx=5, pady=10)
-        self.boton_carrera_busqueda = CTK.CTkButton(self.frame_validacion_carrera, text="🔍", font=(None,20), width=28, command=boton_buscar_estudiante)
-        self.boton_carrera_busqueda.grid(row=0, column=4, padx=5, pady=10)
-        self.etiqueta_excepciones = CTK.CTkLabel(self.frame_validacion_carrera,height=15)
-        
-    def buscar_registro_modificar(self,cedula_busqueda, carrera_busqueda, ventana_para_modulo_estudiantes, estudiante=False):
-        self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas de cédulas u objetos
-
+    def guardar_usuario(self):
+        """Guarda el usuario nuevo"""
         try:
-            self.frame_mostrar_registro_busqueda.destroy()
-            self.boton_guardar.destroy()
-        except:
-            pass
+            tipo_seleccionado = self.widgets["tipo"].get()
+            datos_usuario = {}
 
-        if estudiante:
-            self.ventana_modificacion_estudiantes = CTK.CTkFrame(ventana_para_modulo_estudiantes)
-            self.ventana_modificacion_estudiantes.pack()
-            self.frame_mostrar_registro_busqueda = CTK.CTkFrame(self.ventana_modificacion_estudiantes,fg_color="transparent")
-                    
-        else:
-            self.frame_mostrar_registro_busqueda = CTK.CTkFrame(self.ventana_modificacion_estudiantes,fg_color="transparent")
+            # Obtener datos de campos comunes
+            for campo in ["identificacion", "nombre", "apellido"]:
+                datos_usuario[campo] = self.widgets[campo].get()
+                if not self.Ut.validar_campo(self.frame, datos_usuario[campo], campo, self.config_campos, self.config_campos[campo]["longitud"]):
+                    return
+            # Obtener datos específicos según tipo
+            if tipo_seleccionado == "Estudiante Ingeniería":
+                for campo in ["telefono", "promedio"]:
+                    datos_usuario[campo] = self.widgets[campo].get()
+                    if not self.Ut.validar_campo(self.frame, datos_usuario[campo], campo, self.config_campos, self.config_campos[campo]["longitud"]):
+                        return
+                for campo in ["semestre"]:
+                    datos_usuario[campo] = self.widgets[campo].get()
 
-            try:
-                self.entrada_id_busqueda.configure(border_color="gray")
-                self.etiqueta_excepciones.configure(text="", padx=0, pady=0)
-            except:
-                pass
-            try:
-                int(self.entrada_id_busqueda.get())
-            except ValueError:
-                self.entrada_id_busqueda.configure(border_color="#FF5844")
-                self.etiqueta_excepciones.configure(text=f"Valor no valido", padx=10, pady=3)
-                self.etiqueta_excepciones.grid(row=1, column=0, columnspan=5, padx=5)
+            elif tipo_seleccionado == "Estudiante Diseño":
+                for campo in ["telefono"]:
+                    datos_usuario[campo] = self.widgets[campo].get()
+                    if not self.Ut.validar_campo(self.frame, datos_usuario[campo], campo, self.config_campos, self.config_campos[campo]["longitud"]):
+                        return
+                for campo in ["modalidad", "cantidad_asignaturas"]:
+                    datos_usuario[campo] = self.widgets[campo].get()
+
+            # Verificar serial duplicado
+            if self.Ut.identificador_existe(self.frame, datos_usuario["identificacion"], self.configuracion_usuarios):
+                self.Ut.mostrar_mensaje(self.frame, "✗ Ya existe un usuario con este id", "red")
                 return
+
+            # Crear objeto usuario
+            if tipo_seleccionado == "Estudiante Ingeniería":
+                nuevo_usuario = ESTUDIANTE_INGENIERIA(datos_usuario["identificacion"], datos_usuario["nombre"], datos_usuario["apellido"], datos_usuario["telefono"], datos_usuario["semestre"], datos_usuario["promedio"], estado="ACTIVO")
+            elif tipo_seleccionado == "Estudiante Diseño":
+                nuevo_usuario = ESTUDIANTE_DISENO(datos_usuario["identificacion"], datos_usuario["nombre"], datos_usuario["apellido"], datos_usuario["telefono"], datos_usuario["modalidad"], datos_usuario["cantidad_asignaturas"], estado="ACTIVO")
+            elif tipo_seleccionado == "Administrador":
+                nuevo_usuario = ADMIN(datos_usuario["identificacion"], datos_usuario["nombre"], datos_usuario["apellido"], estado="ACTIVO")
+
+            # Guardar
+            nombre_archivo, encabezados = self.configuracion_usuarios[tipo_seleccionado]    
+            self.Ut.escribir_csv(self.frame, nuevo_usuario, nombre_archivo, encabezados)
+            self.Ut.mostrar_mensaje(self.frame, "✓ Usuario guardado correctamente", "green")
+            self.limpiar_formulario()
+
+        except Exception as error:
+            self.Ut.mostrar_mensaje(self.frame, f"✗ Error al guardar: {str(error)}", "red")
+
+    def limpiar_formulario(self):
+        """Limpia el formulario después de guardar"""
+        for clave, widget in self.widgets.items():
+            if clave != "tipo" and hasattr(widget, "delete"):
+                widget.configure(state="normal")
+                widget.delete(0, "end")
+        self.widgets["tipo"].set("Estudiante Ingeniería")
+        self.actualizar_campos()
+                    
+    # =================== MOSTRAR USUARIOS ===================
+    
+    def mostrar_usuarios(self):
+        """Muestra todos los usuarios"""
+        self.Ut.limpiar_frame(self.frame)
+        
+        contenedor_principal = CTK.CTkTabview(self.frame, border_width=1, border_color="gray")
+        contenedor_principal.pack()
+        
+        contenedor_secundario = {}
+        for tipo in self.configuracion_usuarios.keys():
+            contenedor_secundario[tipo] = contenedor_principal.add(tipo)
+                
+        fila_actual = 0
+        hay_usuarios = False
+        
+        for tipo_usuario, (nombre_archivo, encabezados) in self.configuracion_usuarios.items():
+            datos_usuarios = self.Ut.leer_csv(self.frame, nombre_archivo)
+            contenedor = contenedor_secundario[tipo_usuario]
+            if not datos_usuarios:
+                continue
             
-        def actualizar_datos_estudiante(actualizar=True, activar=False):
-            if actualizar:
-                persona_actual.cedula = self.entrada_cedula.get()
-                persona_actual.nombre = self.entrada_nombre.get()
-                persona_actual.apellido = self.entrada_apellido.get()
-                persona_actual.telefono = self.entrada_telefono.get()
-                persona_actual.estado = self.desplegable_estado.get()
-                
-                if persona_actual.estado == "INACTIVO":
-                    persona_actual.serial = ""
-
-                if self.eleccion_carrera == "Ingeniería":
-                    persona_actual.semestre = self.desplegable_semestre.get()
-                    persona_actual.promedio = self.entrada_promedio.get()
-                                            
-                elif self.eleccion_carrera == "Diseño":
-                    persona_actual.modalidad = self.desplegable_modalidad.get()
-                    persona_actual.cantidad_asignaturas = self.desplegable_cantidad_materias.get()
-            elif activar:
-                persona_actual.estado = self.desplegable_estado.get()
-                
-            self.lector_csv_estudiantes(leer_archivo=False, modificar=True)
-            self.frame_mostrar_registro_busqueda.destroy()
-            self.boton_guardar.destroy()
-
-            self.etiqueta_excepciones.configure(text="Datos actualizados correctamente.", padx=10, pady=3)
-            self.etiqueta_excepciones.grid(row=1, column=0, columnspan=5, padx=5)
-
-        def validacion_actualizar_datos_estudiante():
-            errores = self.validar_datos_registro()
-
-            if errores:
-                self.mostrar_errores_registro(errores)
-            else:
-                actualizar_datos_estudiante()
-
-        def activacion_estudiante():
-            actualizar_datos_estudiante(actualizar=False, activar=True)
-
-        def mostrar_datos_estudiante(persona_actual, carrera):
+            hay_usuarios = True
             
-            self.frame_mostrar_registro_busqueda.pack()
-            self.paneles_segun_carrera(self.frame_mostrar_registro_busqueda, carrera, not estudiante)
-            self.entrada_cedula.insert(0, persona_actual.cedula)
-            self.entrada_cedula.configure(state="readonly")
-            self.entrada_nombre.insert(0, persona_actual.nombre)
-            self.entrada_apellido.insert(0, persona_actual.apellido)
-            self.entrada_telefono.insert(0, persona_actual.telefono)
-
-            if carrera == "Ingeniería":
-                self.desplegable_semestre.set(persona_actual.semestre)
-                self.entrada_promedio.insert(0, persona_actual.promedio)
-            elif carrera == "Diseño":
-                self.desplegable_modalidad.set(persona_actual.modalidad)
-                self.desplegable_cantidad_materias.set(persona_actual.cantidad_asignaturas)
+            # Título del tipo
+            CTK.CTkLabel(contenedor, text=f"📊 {tipo_usuario}", font=("Arial", 14, "bold"),text_color="#4CAF50").grid(row=fila_actual, column=0, columnspan=len(encabezados),pady=(8, 5), sticky="w")
+            fila_actual += 1
+            
+            # Configurar columnas
+            for columna in range(len(encabezados)):
+                contenedor.grid_columnconfigure(columna, weight=1, minsize=87)
+            
+            # Encabezados
+            for columna, campo in enumerate(encabezados):
+                if campo not in ["rol"]:
+                    nombre_campo = self.formatear_campo(campo)
+                    CTK.CTkLabel(contenedor, text=nombre_campo, font=("Arial", 10, "bold"),text_color="white", fg_color="#2E2E2E", width=90, height=40).grid(row=fila_actual, column=columna, padx=1, pady=1, sticky="nsew")
+            fila_actual += 1
+            
+            # Datos
+            for indice_usuario, usuario in enumerate(datos_usuarios):
+                color_fila = "#3A3A3A" if indice_usuario % 2 == 0 else "#2A2A2A"
                 
-            if not estudiante:
-                self.desplegable_estado.set(persona_actual.estado)
+                for columna, campo in enumerate(encabezados):
+                    valor_campo = usuario.get(campo, "N/A")
+                    if campo not in ["rol"]:
+                        # Formatear valores especiales
+                        if campo == "estado":
+                            color_fila = "#4CAF50" if valor_campo.lower() == "activo" else "#F44336"
+                        
+                        CTK.CTkLabel(contenedor, text=str(valor_campo), font=("Arial", 9),text_color="white", fg_color=color_fila, width=90, height=40,wraplength=85).grid(row=fila_actual, column=columna, padx=1, pady=0, sticky="nsew")
+                
+                fila_actual += 1
+                    
+        if not hay_usuarios:
+            CTK.CTkLabel(contenedor, text="📋 No hay usuarios registrados", font=("Arial", 14),text_color="#888888").grid(row=0, column=0, pady=30)
+        
+        # Botón actualizar
+        CTK.CTkButton(self.frame, text="🔄 Actualizar", command=self.mostrar_usuarios,font=("Arial", 10, "bold"), width=120, height=28).pack(pady=8)
 
-            self.boton_guardar = CTK.CTkButton(self.frame_mostrar_registro_busqueda, text="Guardar cambios", command=validacion_actualizar_datos_estudiante)
-            self.boton_guardar.pack(pady=10)
+    def formatear_campo(self, nombre_campo):
+        """Formatea nombres de campos para mostrar"""
 
-        def mostrar_inactivo(persona_actual):
-            self.frame_mostrar_registro_busqueda.pack()
-            self.etiqueta_excepciones.configure(text="El documento se encuentra en estado INACTIVO.", padx=10, pady=3)
-            self.etiqueta_excepciones.grid(row=1, column=0, columnspan=5, padx=5)
+        formatos_campos = {
+            "identificacion": "ID",
+            "telefono": "Teléfono",
+            "cantidad_asignaturas": "C. asignaturas"}
 
-            CTK.CTkLabel(self.frame_mostrar_registro_busqueda, text=f"Cédula: {persona_actual.cedula}").grid(row=0, column=0, padx=10, pady=10)
-            self.desplegable_estado = CTK.CTkComboBox(self.frame_mostrar_registro_busqueda, values=["ACTIVO", "INACTIVO"], state="readonly")
-            self.desplegable_estado.set(persona_actual.estado)
-            self.desplegable_estado.grid(row=0, column=1, padx=10, pady=10)
+        return formatos_campos.get(nombre_campo, nombre_campo.title())
 
-            self.boton_guardar = CTK.CTkButton(self.frame_mostrar_registro_busqueda, text="Guardar cambios", command=activacion_estudiante)
-            self.boton_guardar.grid(row=1, column=0, columnspan=2)
+    # =================== MODIFICAR USUARIOS ===================
+    
+    def modificar_usuario(self):
+        """Inicia modificación de usuario"""
+        self.Ut.limpiar_frame(self.frame)
+        
+        CTK.CTkLabel(self.frame, text="Modificar usuario", font=("", 18, "bold")).pack(pady=15)
+        CTK.CTkLabel(self.frame, text="Ingrese la identificación del usuario:", font=("", 12)).pack(pady=5)
+        
+        entrada_identificacion = CTK.CTkEntry(self.frame, placeholder_text="Identificación (máx 15 caracteres)", width=200)
+        entrada_identificacion.pack(pady=10)
+        
+        # Validación de longitud
+        def validar_serial(evento):
+            if len(entrada_identificacion.get()) > 15:
+                entrada_identificacion.delete(15, "end")
+                self.Ut.mostrar_mensaje(self.frame, "⚠ Identificación limitado a 15 caracteres", "orange")
+        entrada_identificacion.bind("<KeyRelease>", validar_serial)
+        
+        frame_botones = CTK.CTkFrame(self.frame)
+        frame_botones.pack(pady=15)
+        
+        CTK.CTkButton(frame_botones, text="Buscar usuario",command=lambda: self.buscar_usuario(entrada_identificacion.get().strip())).pack(side="left", padx=5)
+        CTK.CTkButton(frame_botones, text="Limpiar",command=lambda: entrada_identificacion.delete(0, "end")).pack(side="left", padx=5)
 
-        # Buscar en Ingeniería
-        if carrera_busqueda == "Ingeniería" and cedula_busqueda in self.cedulas_estudiantes_ingenieria_lista:
-            for persona_actual in self.estudiantes_ingenieria_lista:
-                if persona_actual.cedula == cedula_busqueda:
-                    if persona_actual.estado == "ACTIVO":
-                        mostrar_datos_estudiante(persona_actual, "Ingeniería")
-                    else:
-                        mostrar_inactivo(persona_actual)
+    def buscar_usuario(self, identificacion_buscar, tipo_rol="Administrador"):
+        """Busca un usuario por identificación"""
+        if not identificacion_buscar:
+            self.Ut.mostrar_mensaje(self.frame, "✗ Ingrese un número de identificación", "red")
+            return
+        
+        if len(identificacion_buscar) < 3 or len(identificacion_buscar) > 15:
+            self.Ut.mostrar_mensaje(self.frame, "✗ La identificación debe tener entre 3 y 15 caracteres", "red")
+            return
+        
+        for tipo_usuario, (nombre_archivo, encabezados) in self.configuracion_usuarios.items():
+            lista_usuarios = self.Ut.leer_csv(self.frame, nombre_archivo)
+            for indice, usuario in enumerate(lista_usuarios):
+                if usuario.get("identificacion", "").strip().lower() == identificacion_buscar.lower():
+                    self.mostrar_formulario_modificacion(usuario, lista_usuarios, nombre_archivo, encabezados, indice, tipo_usuario, tipo_rol)
                     return
+        
+        self.Ut.mostrar_mensaje(self.frame, "✗ Usuario no encontrado", "red")
 
-        # Buscar en Diseño
-        elif carrera_busqueda == "Diseño" and cedula_busqueda in self.cedulas_estudiantes_diseno_lista:
-            for persona_actual in self.estudiantes_diseno_lista:
-                if persona_actual.cedula == cedula_busqueda:
-                    if persona_actual.estado == "ACTIVO":
-                        mostrar_datos_estudiante(persona_actual, "Diseño")
-                    else:
-                        mostrar_inactivo(persona_actual)
-                    return
+    def mostrar_formulario_modificacion(self, usuario_encontrado, lista_usuarios, nombre_archivo, encabezados, indice_usuario, tipo_usuario, tipo_rol):
+        """Muestra formulario de modificación"""
+        self.Ut.limpiar_frame(self.frame)
+        
+        CTK.CTkLabel(self.frame, text=f"Datos personales: {usuario_encontrado["identificacion"]}", font=("", 18, "bold")).pack(pady=10)
+        CTK.CTkLabel(self.frame, text=f"Tipo: {tipo_usuario}", font=("", 14, "bold"), text_color="lightblue").pack(pady=5)
+        
+        frame_campos = CTK.CTkFrame(self.frame)
+        frame_campos.pack()
+        
+        entradas_campos = {}
+        
+        for campo in encabezados:
+            if tipo_rol == "Administrador":        
+                if campo in ["identificacion", "estado"]:
+                    entrada_campo = self.Ut.crear_campo(frame_campos, campo, self.config_campos, usuario_encontrado[campo])
+                    entradas_campos[campo] = entrada_campo
+        
+            if campo not in ["identificacion","estado","serial","rol"]:
+                entrada_campo = self.Ut.crear_campo(frame_campos, campo, self.config_campos, usuario_encontrado[campo])
+                entradas_campos[campo] = entrada_campo
+        
+        frame_botones_mod = CTK.CTkFrame(self.frame)
+        frame_botones_mod.pack(pady=20)
+        
+        CTK.CTkButton(frame_botones_mod, text="Guardar Cambios",command=lambda: self.guardar_modificacion(usuario_encontrado, lista_usuarios, nombre_archivo, encabezados, indice_usuario, entradas_campos, tipo_usuario, tipo_rol),font=("", 12, "bold")).pack(side="left", padx=5)
+        if tipo_rol == "Administrador":
+            CTK.CTkButton(frame_botones_mod, text="Cancelar",command=self.modificar_usuario).pack(side="left", padx=5)
 
-        # No se encontró
-        self.etiqueta_excepciones.configure(text=f"El documento {cedula_busqueda} no existe en el sistema.", padx=10, pady=3)
-        self.etiqueta_excepciones.grid(row=1, column=0, columnspan=5, padx=5)
-        return
-        
-    def mostrar_estudiantes(self, ventana_mostrar_estudiantes):
-        self.lector_csv_estudiantes() # Ejecución de método lector para usar las listas de cédulas u objetos
-        pantalla_validacion_carrera = CTK.CTkFrame(ventana_mostrar_estudiantes)
-        pantalla_validacion_carrera.pack(pady=10)
-        pantalla_mostrar_registros = CTK.CTkFrame(ventana_mostrar_estudiantes)
-        
-        def mostrar_estudiantes_segun_carrera(carrera):
-            pantalla_validacion_carrera.destroy()
-            pantalla_mostrar_registros.pack(pady=10)
+    def guardar_modificacion(self, usuario_original, lista_usuarios, nombre_archivo, encabezados, indice_usuario, entradas_campos, tipo_usuario, tipo_rol):
+        """Guarda las modificaciones"""
+        try:
             
-            if carrera == "Ingeniería":
-                lista = self.estudiantes_ingenieria_lista
-            if carrera == "Diseño":
-                lista = self.estudiantes_diseno_lista
-            
-            for numero_registro, registro in enumerate(lista):
-                try:
-                    registro_lista = registro.convertir_lista_ingenieria()
-                except:
-                    try:
-                        registro_lista = registro.convertir_lista_diseno()
-                    except:
-                        etiqueta_error_conversion = CTK.CTkLabel(pantalla_validacion_carrera, text="Error al convertir a listas.", height=15)
-                        etiqueta_error_conversion.grid(row=2, column=0, columnspan=3, padx=3)
-                                        
-                if numero_registro == 0:
-                    for numero, dato in enumerate(registro_lista):
-                        CTK.CTkLabel(pantalla_mostrar_registros, text=dato, fg_color="#2A2A2A", height= 33, width=70, wraplength=70).grid(row=numero_registro+1, column=numero, pady=3)
-                else:
-                    for numero, dato in enumerate(registro_lista):
-                        etiqueta_entrada_registro = CTK.CTkEntry(pantalla_mostrar_registros, fg_color="#4b4b4b", height= 33, width=70, corner_radius=0, border_width=0)
-                        etiqueta_entrada_registro.insert(0,dato)
-                        etiqueta_entrada_registro.configure(state="readonly")
-                        etiqueta_entrada_registro.grid(row=numero_registro+1, column=numero)
+            # Actualizar datos
+            for campo, entrada in entradas_campos.items():
+                if tipo_rol == "Administrador":
+                    if campo in ["identificacion", "estado"]:
+                        lista_usuarios[indice_usuario][campo] = entrada.get().strip()
+                    if lista_usuarios[indice_usuario]["estado"].lower() == "inactivo":
+                        lista_usuarios[indice_usuario]["serial"] = ""
         
-        def mostar_estudiantes_boton():
-            mostrar_estudiantes_segun_carrera(desplegable_carrera.get())
+                if campo not in ["identificacion","estado","serial","rol"]:
+                    lista_usuarios[indice_usuario][campo] = entrada.get().strip()
             
-        etiqueta_carrera = CTK.CTkLabel(pantalla_validacion_carrera, text="Seleccionar carrera")
-        etiqueta_carrera.grid(row=0, column=0, padx=10)
-        desplegable_carrera = CTK.CTkComboBox(pantalla_validacion_carrera, values=["Ingeniería","Diseño"], state="readonly")
-        desplegable_carrera.set("Ingeniería")
-        desplegable_carrera.grid(row=0, column=1, padx=10)
-        boton_buscar_carrera = CTK.CTkButton(pantalla_validacion_carrera, text="🔍", font=(None,20), width=28, command=mostar_estudiantes_boton)
-        boton_buscar_carrera.grid(row=0, column=2, padx=10) 
+            # Escribir archivo
+            with open(nombre_archivo, "w", newline="", encoding="utf-8") as archivo:
+                escritor = csv.DictWriter(archivo, fieldnames=encabezados)
+                escritor.writeheader()
+                escritor.writerows(lista_usuarios)
+            
+            # Mostrar éxito
+            self.Ut.limpiar_frame(self.frame)
+            CTK.CTkLabel(self.frame, text=f"✓ Usuario {usuario_original["identificacion"]} modificado correctamente",font=("", 16, "bold"), text_color="green").pack(pady=20)
+            if tipo_rol == "Administrador":
+                CTK.CTkButton(self.frame, text="Modificar usuario",command=self.modificar_usuario, font=("", 12, "bold")).pack(padx=10)
+            
+        except Exception as error:
+            self.Ut.mostrar_mensaje(self.frame, f"✗ Error al guardar: {str(error)}", "red")

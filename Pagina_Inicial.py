@@ -1,129 +1,92 @@
 import customtkinter as CTK
 import Metodos_Estudiantes,Metodos_Equipos,Metodos_Prestamos,Objetos,csv
+from Generico import Utilidades
+
 
 class PANTALLA_PRINCIPAL:
     def __init__(self):
+        CTK.set_appearance_mode("dark")
+        CTK.set_default_color_theme("dark-blue")
         self.pagina_inicial = CTK.CTk()
         self.pagina_inicial.geometry("+500+150")
         self.pagina_inicial.resizable(False,False)
+        self.pagina_inicial.iconbitmap("user.ico")
+        self.Ut = Utilidades()
+        self.mensaje_error = None
         self.pantalla_login()
 
+        self.configuracion_usuarios = self.Ut.configuracion_usuarios()
+        
+        # Configuración de campos
+        self.config_campos = {
+            "identificacion": {"label": "No. Identificación", "Tipo": "Entry", "placeholder": "No. Identificación", "longitud": 15, "tipo_dato": "numero"},
+        }
+
+    def buscar_usuario(self, identificacion_buscar):
+        for tipo_usuario, (nombre_archivo, encabezados) in self.configuracion_usuarios.items():
+            lista_usuarios = self.Ut.leer_csv(self.Frame_Contenedor_Principal, nombre_archivo)
+            for indice, usuario in enumerate(lista_usuarios):
+                if usuario.get("identificacion", "").strip().lower() == identificacion_buscar.lower():
+                    return tipo_usuario, usuario
+        return False, False
+
     def boton_volver_login(self):
+        self.pagina_inicial.iconbitmap("user.ico")
         for elemento in self.pagina_inicial.winfo_children():
             elemento.destroy()
         self.pagina_inicial.geometry("370x230")
         self.pantalla_login()
+
+    def mostrar_mensaje(self, frame, mensaje, color="white"):
+        """Muestra un mensaje en la interfaz"""
+        if self.mensaje_error:
+            self.mensaje_error.destroy()
+        self.mensaje_error = CTK.CTkLabel(frame, text=mensaje, height=15, wraplength=250, text_color=color)
+        self.mensaje_error.grid(row=2,column=0)
+        frame.update_idletasks()
             
-    def lector_csv_estudiantes(self, buscar=False, buscar_informacion_estudiante=False, cedula_buscar=None):
-        self.cedulas_estudiantes_ingenieria_lista = []
-        self.estudiantes_ingenieria_lista = []
-        with open("Estudiantes_Ingenieria.csv", "r", newline="", encoding='utf-8') as Estudiantes_ingenieria_csv:
-            Lector_Ingenieria = csv.reader(Estudiantes_ingenieria_csv)
-            # Crea un lista con los valores extraidos, (lista de cédulas de ingenieria)
-            for estudiante in Lector_Ingenieria:
-                cedula, nombre, apellido, telefono, semestre, promedio, estado, serial = estudiante
-                self.cedulas_estudiantes_ingenieria_lista.append(cedula)
-            # Extrae toda la información del archivo, convierte los valores en objetos y crea un lista (lista de objetos de ingenieria)
-                self.estudiantes_ingenieria_lista.append(Objetos.ESTUDIANTE_INGENIERIA(cedula, nombre, apellido, telefono, semestre, promedio, estado, serial))
-
-        self.cedulas_estudiantes_diseno_lista = []
-        self.estudiantes_diseno_lista = []
-        with open("Estudiantes_Diseno.csv", "r", newline="", encoding='utf-8') as Estudiantes_diseno_csv:
-            Lector_Diseno = csv.reader(Estudiantes_diseno_csv)
-            # Crea un lista con los valores extraidos, (lista de cédulas de diseño)
-            for estudiante in Lector_Diseno:
-                cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado, serial = estudiante
-                self.cedulas_estudiantes_diseno_lista.append(cedula)
-            # Extrae toda la información del archivo, convierte los valores en objetos y crea un lista (lista de objetos de diseño)
-                self.estudiantes_diseno_lista.append(Objetos.ESTUDIANTE_DISENO(cedula, nombre, apellido, telefono, modalidad, cantidad_asignaturas, estado, serial))
-
-        self.cedulas_administradores_lista = []
-        self.administradores_lista = []
-        with open("Administradores.csv", "r", newline="", encoding='utf-8') as Administradores_csv:
-            Lector_administradores = csv.reader(Administradores_csv)
-            # Crea un lista con los valores extraidos, (lista de cédulas de administradores)
-            for administrador in Lector_administradores:
-                cedula, nombre, apellido, telefono, estado, serial = administrador
-                self.cedulas_administradores_lista.append(cedula)
-            # Extrae toda la información del archivo, convierte los valores en objetos y crea un lista (lista de objetos de administradores)
-                self.administradores_lista.append(Objetos.ADMIN(cedula, nombre, apellido, telefono, estado, serial))
-
-        if buscar:
-        # Buscar estado en todos los usuarios
-            for persona_actual in self.estudiantes_ingenieria_lista + self.estudiantes_diseno_lista + self.administradores_lista:
-                if persona_actual.cedula == cedula_buscar:
-                    if persona_actual.estado == "ACTIVO":
-                        return True
-                    else:
-                        return False
-                
-#        # Buscar estado en Diseño
-#            for persona_actual in self.estudiantes_diseno_lista:
-#                if persona_actual.cedula == cedula_buscar:
-#                    if persona_actual.estado == "ACTIVO":
-#                        return True
-#                    else:
-#                        return False
-
-        if buscar_informacion_estudiante:
-        # Buscar en Ingeniería
-            for persona_actual in self.estudiantes_ingenieria_lista:
-                if persona_actual.cedula == cedula_buscar:
-                    return persona_actual, "Ingeniería"
-                
-        # Buscar en Diseño
-            for persona_actual in self.estudiantes_diseno_lista:
-                if persona_actual.cedula == cedula_buscar:
-                    return persona_actual, "Diseño"
-
-        # Buscar en Administradores
-            for persona_actual in self.administradores_lista:
-                if persona_actual.cedula == cedula_buscar:
-                    return persona_actual, "Administrador"
-
     def pantalla_login(self):
         def registrar_estudiante():
-            self.pagina_inicial.geometry("370x370")
+            self.pagina_inicial.geometry("370x500")
+            self.pagina_inicial.iconbitmap("user.ico")
             self.frame_pantalla_busqueda.destroy()
             self.Frame_Contenedor_Principal.pack(side="left", pady=10, padx=10, fill="both", expand=True)
-            objeto_registro_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
-            objeto_registro_estudiantes.registrar_estudiantes_validacion_carrera(self.Frame_Contenedor_Principal)
-            boton_volver_iniciar_sesion = CTK.CTkButton(self.Frame_Contenedor_Principal, text="Volver al inicio", command=self.boton_volver_login, width=170)
+            objeto_registro_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes(self.Frame_Contenedor_Principal)
+            objeto_registro_estudiantes.registrar_estudiante()
+            boton_volver_iniciar_sesion = CTK.CTkButton(self.Frame_Contenedor_Principal, text="Volver al inicio", command=self.boton_volver_login, width=170, font=("", 12, "bold"))
             boton_volver_iniciar_sesion.pack()
 
         def login_validacion():
-            self.lector_csv_estudiantes()
-            
-            cedula_busqueda = self.entrada_busqueda.get()
+
+            identificacion_busqueda = self.entrada_busqueda.get()
+
             try:
-                int(cedula_busqueda)
+                int(identificacion_busqueda)
             except ValueError:
-                self.entrada_busqueda.configure(border_color="#FF5844")
-                self.etiqueta_busqueda_error.configure(text="Valor no valido")
-                self.etiqueta_busqueda_error.grid(row=2,column=0)
+                self.entrada_busqueda.configure(border_color="red")
+                self.mostrar_mensaje(self.frame_pantalla_busqueda, f"✗ Valor no valido", "red")
                 return
-#            if (cedula_busqueda in self.cedulas_estudiantes_ingenieria_lista) or (cedula_busqueda in self.cedulas_estudiantes_diseno_lista):
-            if cedula_busqueda in self.cedulas_estudiantes_ingenieria_lista + self.cedulas_estudiantes_diseno_lista + self.cedulas_administradores_lista:
-                if self.lector_csv_estudiantes(buscar=True, cedula_buscar=cedula_busqueda):                    
+
+            tipo_usuario, datos_usuario = self.buscar_usuario(identificacion_busqueda)
+
+            if tipo_usuario and datos_usuario:
+                if datos_usuario.get("estado", "") == "INACTIVO":
+                    self.entrada_busqueda.configure(border_color="gray")
+                    self.mostrar_mensaje(self.frame_pantalla_busqueda, f"✗ El usuario {identificacion_busqueda} se encuentra inactivo, contacte al administrador", "red")
+                    return
+                else:
                     self.pagina_inicial.title("EQUIPOS ELECTRÓNICOS SAN JUAN DE DIOS")
                     self.frame_pantalla_busqueda.destroy()
-                    informacion_estudiante, carrera_estudiante = self.lector_csv_estudiantes(buscar=False,buscar_informacion_estudiante=True,cedula_buscar=cedula_busqueda)
-                    if carrera_estudiante in ["Ingeniería","Diseño"]:
-                        self.menu_estudiantes(informacion_estudiante_login=informacion_estudiante, carrera_estudiante_login=carrera_estudiante)
-                    elif carrera_estudiante == "Administrador":
-                        self.menu_administrador(informacion_estudiante_login=informacion_estudiante, carrera_estudiante_login=carrera_estudiante)
-                else:
-                    self.entrada_busqueda.configure(border_color="gray")
-                    self.etiqueta_busqueda_error.configure(text=f"El usuario {cedula_busqueda} se encuentra inactivo, contacte al administrador")
-                    self.etiqueta_busqueda_error.grid(row=2,column=0)                    
+                    if tipo_usuario in ["Estudiante Ingeniería","Estudiante Diseño"]:
+                        self.menu_estudiantes(datos_usuario, tipo_usuario)
+                    elif tipo_usuario == "Administrador":
+                        self.menu_administrador(datos_usuario, tipo_usuario)
             else:
                 self.entrada_busqueda.configure(border_color="gray")
-                self.etiqueta_busqueda_error.configure(text="Usuario no existe")
-                self.etiqueta_busqueda_error.grid(row=2,column=0)
-
+                self.mostrar_mensaje(self.frame_pantalla_busqueda, f"✗ Usuario no existe", "red")
+                
         self.frame_pantalla_busqueda = CTK.CTkFrame(self.pagina_inicial, border_width=1)
         self.frame_pantalla_busqueda.pack(pady=20, padx=20, ipady=5)
-#        self.frame_pantalla_busqueda.pack(pady=20, padx=20, ipady=5, anchor="center")
         
         self.pagina_inicial.title("Inicial sesión")
         self.etiqueta_busqueda = CTK.CTkLabel(self.frame_pantalla_busqueda, text="Inicial sesión", font=(None,26))
@@ -131,8 +94,6 @@ class PANTALLA_PRINCIPAL:
 
         self.entrada_busqueda = CTK.CTkEntry(self.frame_pantalla_busqueda,placeholder_text="Número de identificación",justify="center",font=(None,15),width=300,height=33)
         self.entrada_busqueda.grid(row=1,column=0,pady=5, padx=10)
-
-        self.etiqueta_busqueda_error = CTK.CTkLabel(self.frame_pantalla_busqueda,text="",height=15, wraplength=250)
 
         self.boton_busqueda = CTK.CTkButton(self.frame_pantalla_busqueda, text="Iniciar sesión", font=(None,15), command=login_validacion,width=300,height=33)
         self.boton_busqueda.grid(row=3,column=0,pady=5, padx=10)
@@ -142,105 +103,100 @@ class PANTALLA_PRINCIPAL:
                 
         self.Frame_Botonera_Izquierda = CTK.CTkFrame(self.pagina_inicial,fg_color="transparent",width=150)
         self.Frame_Contenedor_Principal = CTK.CTkScrollableFrame(self.pagina_inicial)
+
+        def validar_longitud(evento):
+            if len(self.entrada_busqueda.get()) > 15:
+                self.entrada_busqueda.delete(15, "end")
+            try:
+                int(self.entrada_busqueda.get())
+            except ValueError:
+                i = len(self.entrada_busqueda.get())
+                self.entrada_busqueda.delete(i-1, "end")
+        self.entrada_busqueda.bind("<KeyRelease>", validar_longitud)
     
     def menu_estudiantes(self, informacion_estudiante_login=None, carrera_estudiante_login=None):
+        self.pagina_inicial.iconbitmap("usergen.ico")
         self.pagina_inicial.geometry("800x500")
-        cedula = informacion_estudiante_login.cedula
+        identificacion = informacion_estudiante_login.get("identificacion", "")
         def limpiar_contenedor():
             for elemento in self.Frame_Contenedor_Principal.winfo_children():
                 elemento.destroy()
         def modificar_estudiantes():
             limpiar_contenedor()
-            objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
-            objeto_estudiantes.buscar_registro_modificar(cedula, carrera_estudiante_login, self.Frame_Contenedor_Principal, True)
+            objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes(self.Frame_Contenedor_Principal, informacion_estudiante_login)
+            objeto_estudiantes.buscar_usuario(identificacion, "Estudiante")
         def mostrar_equipos():
             limpiar_contenedor()
-            objeto_equipos = Metodos_Equipos.Metodos_Equipos()
-#            objeto_equipos.registrar_equipo()
+            objeto_equipos = Metodos_Equipos.Metodos_Equipos(self.Frame_Contenedor_Principal)
+            objeto_equipos.mostrar_equipos()
         def registrar_prestamos():
             limpiar_contenedor()
-            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos(informacion_estudiante_login, carrera_estudiante_login)
-            objeto_prestamos.buscar_registro_modificar(self.Frame_Contenedor_Principal,cedula)
-#        def modificar_prestamos():
-#            limpiar_contenedor()
-#            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos(informacion_estudiante_login, carrera_estudiante_login)
-#            objeto_prestamos.busqueda_estudiantes(self.Frame_Contenedor_Principal,cedula,True)
+            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos(self.Frame_Contenedor_Principal)
+            objeto_prestamos.buscar_usuario_equipo(identificacion, "Estudiante")
             
         self.Frame_Botonera_Izquierda.pack(side="left", ipady=10, ipadx=10, fill="y", expand=False)
         self.Frame_Contenedor_Principal.pack(side="left", pady=10, padx=10, fill="both", expand=True)
-
-#        self.Frame_Botonera_Izquierda.grid(row=1, column=0, ipady=10, ipadx=10)
-#        self.Frame_Contenedor_Principal.grid(row=1, column=1, pady=10, padx=10)
                 
-        etiqueta_nombre = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text=f"Hola {informacion_estudiante_login.nombre}",font=(None, 15))
+        etiqueta_nombre = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text=f"Hola {informacion_estudiante_login.get("nombre","")}",font=(None, 15))
         etiqueta_nombre.pack(pady=3, padx=10)
         etiqueta_menu = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text="Panel de control",font=(None, 15))
         etiqueta_menu.pack(pady=5, padx=10)
         boton_modificar_estudiantes = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Datos personales", command=modificar_estudiantes)
         boton_modificar_estudiantes.pack(pady=3, padx=10)
-        boton_mostrar_equipos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Equipos disponibles", command=mostrar_equipos)
+        boton_mostrar_equipos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Equipos", command=mostrar_equipos)
         boton_mostrar_equipos.pack(pady=3, padx=10)
         boton_registrar_prestamos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Prestamos", command=registrar_prestamos)
         boton_registrar_prestamos.pack(pady=3, padx=10)
-#        boton_modificar_prestamos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Modificar/devolución\nprestamo", command=modificar_prestamos)
-#        boton_modificar_prestamos.pack(pady=3, padx=10)
         boton_volver_iniciar_sesion = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Cerrar sesión", command=self.boton_volver_login)
         boton_volver_iniciar_sesion.pack(pady=3, padx=10)
                 
     def menu_administrador(self, informacion_estudiante_login=None, carrera_estudiante_login=None):
+        self.pagina_inicial.iconbitmap("useradd.ico")
         self.pagina_inicial.geometry("800x500")
-        cedula = informacion_estudiante_login.cedula
+        identificacion = informacion_estudiante_login.get("identificacion", "")
         
         def limpiar_contenedor():
             for elemento in self.Frame_Contenedor_Principal.winfo_children():
                 elemento.destroy()
         def registrar_estudiantes():
             limpiar_contenedor()
-            objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
-            objeto_estudiantes.registrar_estudiantes_validacion_carrera(self.Frame_Contenedor_Principal)
+            objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes(self.Frame_Contenedor_Principal, informacion_estudiante_login)
+            objeto_estudiantes.registrar_estudiante()
         def modificar_estudiantes():
             limpiar_contenedor()
-            objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
-            objeto_estudiantes.busqueda_estudiantes(self.Frame_Contenedor_Principal)
+            objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes(self.Frame_Contenedor_Principal)
+            objeto_estudiantes.modificar_usuario()
         def mostrar_estudiantes():
             limpiar_contenedor()
-            objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes()
-            objeto_estudiantes.mostrar_estudiantes(self.Frame_Contenedor_Principal)
+            objeto_estudiantes = Metodos_Estudiantes.Metodos_Estudiantes(self.Frame_Contenedor_Principal)
+            objeto_estudiantes.mostrar_usuarios()
         def registrar_equipos():
             limpiar_contenedor()
-            objeto_equipos = Metodos_Equipos.Metodos_Equipos()
-#            objeto_equipos.registrar_equipo()
+            objeto_equipos = Metodos_Equipos.Metodos_Equipos(self.Frame_Contenedor_Principal)
+            objeto_equipos.registrar_equipo()
         def modificar_equipos():
             limpiar_contenedor()
-            objeto_equipos = Metodos_Equipos.Metodos_Equipos()
-#            objeto_equipos.registrar_equipo()
+            objeto_equipos = Metodos_Equipos.Metodos_Equipos(self.Frame_Contenedor_Principal)
+            objeto_equipos.modificar_equipo()
         def mostrar_equipos():
             limpiar_contenedor()
-            objeto_equipos = Metodos_Equipos.Metodos_Equipos()
-#            objeto_equipos.registrar_equipo()
-
-#        def registrar_prestamos():
-#            limpiar_contenedor()
-#            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos(informacion_estudiante_login, carrera_estudiante_login)
-#            objeto_prestamos.registrar_prestamo_validacion_carrera(self.Frame_Contenedor_Principal)
+            objeto_equipos = Metodos_Equipos.Metodos_Equipos(self.Frame_Contenedor_Principal)
+            objeto_equipos.mostrar_equipos()
 
         def modificar_prestamos():
             limpiar_contenedor()
-            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos(informacion_estudiante_login, carrera_estudiante_login)
-            objeto_prestamos.busqueda_estudiantes_admin(self.Frame_Contenedor_Principal)
+            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos(self.Frame_Contenedor_Principal, informacion_estudiante_login)
+            objeto_prestamos.modificar_prestamo()
     
         def mostrar_prestamos():
             limpiar_contenedor()
-            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos(informacion_estudiante_login, carrera_estudiante_login)
-            objeto_prestamos.mostrar_prestamos(self.Frame_Contenedor_Principal)
+            objeto_prestamos = Metodos_Prestamos.Metodos_Prestamos(self.Frame_Contenedor_Principal)
+            objeto_prestamos.mostrar_prestamos()
             
         self.Frame_Botonera_Izquierda.pack(side="left", ipady=10, ipadx=10, fill="y", expand=False)
         self.Frame_Contenedor_Principal.pack(side="left", pady=10, padx=10, fill="both", expand=True)
 
-#        self.Frame_Botonera_Izquierda.grid(row=1, column=0, ipady=10, ipadx=10)
-#        self.Frame_Contenedor_Principal.grid(row=1, column=1, pady=10, padx=10)
-                
-        etiqueta_nombre = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text=f"Hola {informacion_estudiante_login.nombre}",font=(None, 15))
+        etiqueta_nombre = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text=f"Hola {informacion_estudiante_login.get("nombre","")}",font=(None, 15))
         etiqueta_nombre.pack(pady=3, padx=10)
         etiqueta_menu = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text="Panel de control",font=(None, 15))
         etiqueta_menu.pack(pady=5, padx=10)
@@ -256,10 +212,7 @@ class PANTALLA_PRINCIPAL:
         boton_modificar_equipos.pack(pady=3, padx=10)
         boton_mostrar_equipos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Mostrar equipos", command=mostrar_equipos)
         boton_mostrar_equipos.pack(pady=3, padx=10)
-#        boton_registrar_prestamos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Registrar prestamos", command=registrar_prestamos)
-#        boton_registrar_prestamos.pack(pady=3, padx=10)
         boton_modificar_prestamos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Realizar/Modificar\nprestamos", command=modificar_prestamos)
-#        boton_modificar_prestamos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Modificar prestamos", command=modificar_prestamos)
         boton_modificar_prestamos.pack(pady=3, padx=10)
         boton_mostrar_prestamos = CTK.CTkButton(self.Frame_Botonera_Izquierda, text="Mostrar prestamos", command=mostrar_prestamos)
         boton_mostrar_prestamos.pack(pady=3, padx=10)
