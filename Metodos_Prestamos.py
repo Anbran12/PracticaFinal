@@ -163,7 +163,10 @@ class Metodos_Prestamos:
                 entrada_campo.configure(state="readonly")
                 entradas_campos[campo] = entrada_campo
                 
-        if tipo_usuario == "Estudiante Ingeniería":
+        if tipo_usuario == "Administrador":
+            self.Ut.mostrar_mensaje(self.frame, "✗ Usuario no apto para prestamos", "red")
+            return
+        elif tipo_usuario == "Estudiante Ingeniería":
             datos = self.Ut.leer_csv(self.frame, "Computadores_Portatiles.csv")
         else: # Estudiantes Diseño
             datos = self.Ut.leer_csv(self.frame, "Tabletas_Graficas.csv")

@@ -26,9 +26,13 @@ class ESTUDIANTE_DISENO(ESTUDIANTES):
     def convertir_lista_diseno(self):
         return [self.identificacion,self.nombre,self.apellido,self.telefono,self.modalidad,self.cantidad_asignaturas,self.estado,self.serial,self.rol]
 
-class ADMIN(ESTUDIANTES):
+class ADMIN():
     def __init__(self, identificacion, nombre, apellido, estado="ACTIVO", rol="Administrador"):
-        super().__init__(identificacion, nombre, apellido, estado, rol)
+        self.identificacion = identificacion 
+        self.nombre = nombre 
+        self.apellido = apellido 
+        self.estado = estado
+        self.rol = rol
         
     def convertir_lista_admin(self):
         return [self.identificacion,self.nombre,self.apellido,self.estado,self.rol]

@@ -137,7 +137,7 @@ class PANTALLA_PRINCIPAL:
         self.Frame_Botonera_Izquierda.pack(side="left", ipady=10, ipadx=10, fill="y", expand=False)
         self.Frame_Contenedor_Principal.pack(side="left", pady=10, padx=10, fill="both", expand=True)
                 
-        etiqueta_nombre = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text=f"Hola {informacion_estudiante_login.get("nombre","")}",font=(None, 15))
+        etiqueta_nombre = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text=f"Hola {informacion_estudiante_login.get("nombre","")}",font=(None, 15), wraplength=100)
         etiqueta_nombre.pack(pady=3, padx=10)
         etiqueta_menu = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text="Panel de control",font=(None, 15))
         etiqueta_menu.pack(pady=5, padx=10)
@@ -196,7 +196,7 @@ class PANTALLA_PRINCIPAL:
         self.Frame_Botonera_Izquierda.pack(side="left", ipady=10, ipadx=10, fill="y", expand=False)
         self.Frame_Contenedor_Principal.pack(side="left", pady=10, padx=10, fill="both", expand=True)
 
-        etiqueta_nombre = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text=f"Hola {informacion_estudiante_login.get("nombre","")}",font=(None, 15))
+        etiqueta_nombre = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text=f"Hola {informacion_estudiante_login.get("nombre","")}",font=(None, 15), wraplength=100)
         etiqueta_nombre.pack(pady=3, padx=10)
         etiqueta_menu = CTK.CTkLabel(self.Frame_Botonera_Izquierda, text="Panel de control",font=(None, 15))
         etiqueta_menu.pack(pady=5, padx=10)

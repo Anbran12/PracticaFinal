@@ -297,7 +297,8 @@ class Metodos_Estudiantes:
                     if campo in ["identificacion", "estado"]:
                         lista_usuarios[indice_usuario][campo] = entrada.get().strip()
                     if lista_usuarios[indice_usuario]["estado"].lower() == "inactivo":
-                        lista_usuarios[indice_usuario]["serial"] = ""
+                        if nombre_archivo in ["Estudiantes_ingenieria.csv", "Estudiantes_diseno.csv"]:
+                            lista_usuarios[indice_usuario]["serial"] = ""
         
                 if campo not in ["identificacion","estado","serial","rol"]:
                     lista_usuarios[indice_usuario][campo] = entrada.get().strip()
