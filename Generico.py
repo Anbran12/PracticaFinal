@@ -1,5 +1,5 @@
 import customtkinter as CTK
-import csv
+import csv, string
 from Objetos import ESTUDIANTE_DISENO,ESTUDIANTE_INGENIERIA,ADMIN,COMPUTADOR_PORTATIL,TABLETA_GRAFICA
 
     # =================== UTILIDADES ===================
@@ -130,6 +130,13 @@ class Utilidades:
             except ValueError:
                 self.mostrar_mensaje(frame, f"✗ {config_campos[clave_campo]["label"]} debe ser un número válido", "red")
                 return False
+        # Validar texto
+        else:
+            for i in list(valor):
+                if i not in list(string.ascii_letters + "ñ"):
+                    self.mostrar_mensaje(frame, f"✗ El campo {config_campos[clave_campo]["label"]} no puede contener caracteres especiales", "red")
+                    return False        
+
         
         return True
 
